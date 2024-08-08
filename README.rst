@@ -13,14 +13,17 @@ Quick start steps:
 * clone this repo
 * cd repo/
 * create venv with kas and activate
-* edit ``build.yml``
+* edit the KAS configuration file ``build.yml``
 
 1. comment the machine key at the top (if not correrct)
 2. uncomment desired machine key, eg: ``refdes-me-aa1-270-2i2-d11e-nfx3-st1``
-3. save and exit
+3. do the same with the ``UBOOT_CONFIG`` env key, ie, choose the boot media
+4. save and exit
 
 * run sync/build commands via tox or kas directly
-
+* sync the layer repositories
+* check the contents of ``local.conf`` and ``bblayers.conf`` and adjust
+  as needed
 
 Notes on Enclustra BSP for Cyclone/Arria FPGA HW
 ================================================
@@ -37,9 +40,9 @@ Contains two meta-layers:
 Readme is not boiler-plate, but contians changelog and integration bits,
 some of which is shown below:
 
-Yocto: mickledore
-U-Boot: 2023.01
-Linux kernel: 6.1.0
+* Yocto branch: mickledore
+* U-Boot: 2023.01
+* Linux kernel: 6.1.0
 
 based on meta-intel-fpga: https://git.yoctoproject.org/meta-intel-fpga
 
@@ -55,7 +58,8 @@ Intel Arria 10  | Mercury+ AA1 , R2 | Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
 Reference Designs for Intel Quartus II
 --------------------------------------
 
-The meta-enclustra-refdes_ Yocto layer in this reference design uses prebuilt binaries for the following reference designs:
+The meta-enclustra-refdes_ Yocto layer in this reference design uses
+prebuilt binaries for the following reference designs:
 
 .. _meta-enclustra-refdes: https://github.com/enclustra/meta-enclustra-socfpga/blob/v2023.1/meta-enclustra-refdes
 
@@ -77,7 +81,7 @@ Host Requirements
 
 Host Operating System:
 
-This reference design was tested on following operating systems:
+This reference design build was tested on following operating systems:
 
 * Ubuntu 22.04
 
