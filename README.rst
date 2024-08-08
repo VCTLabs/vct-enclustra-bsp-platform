@@ -10,20 +10,21 @@ the ``mickledore`` branches and a KAS_ build configuration.
 Quick start steps:
 
 * cd somewhere
-* clone this repo
+* clone this repo with -b <branch>
 * cd repo/
-* create venv with kas/enclustra and activate
-* edit the KAS configuration file ``build.yml``
+* create .venv with ``tox -e dev``
+* edit the KAS configuration file ``meta-enclustra-socfpga/build.yml``
 
 1. comment the machine key at the top (if not correrct)
 2. uncomment desired machine key, eg: ``refdes-me-aa1-270-2i2-d11e-nfx3-st1``
 3. do the same with the ``UBOOT_CONFIG`` env key, ie, choose the boot media
 4. save and exit
 
-* run sync/build commands via tox or kas directly
-* sync the layer repositories
-* check the contents of ``local.conf`` and ``bblayers.conf`` and adjust
-  as needed
+* check the contents of ``build/local.conf`` and ``build/bblayers.conf``
+  and adjust as needed.
+
+* run ``tox -e dev -- build`` to build refdes image for selected machine
+
 
 Notes on Enclustra BSP for Cyclone/Arria FPGA HW
 ================================================
