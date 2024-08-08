@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 
 # generated/user files and directories
+bitbake/
+*openembedded*/
 meta-*/
 ext/
 *.pdf
