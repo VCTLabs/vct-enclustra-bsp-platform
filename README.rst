@@ -57,8 +57,10 @@ more convenient/shared location by using some `environment variables`_
 as shown below; set them before running the ``build`` command::
 
   (.venv) $ export DL_DIR="${HOME}/shared/downloads"
-  (.venv) $ export SSTATE_DIR="${HOME}/shared/poky/sstate-cache"
+  (.venv) $ export SSTATE_DIR="${HOME}/shared/oe/sstate-cache"
 
+.. note:: You may need to create the above directories manually before
+          starting a new build.
 
 The (yocto) build config files can be found in the usual place in the
 ``build`` folder, ie::
@@ -68,6 +70,10 @@ The (yocto) build config files can be found in the usual place in the
 
 
 .. _environment variables: https://kas.readthedocs.io/en/latest/command-line.html#variables-glossary
+
+.. important:: *Do not* delete the build folder to start a fresh build,
+              rather *do* remove ``build/tmp-glibc`` for that very purpose.
+
 
 Notes on Enclustra BSP for Cyclone/Arria FPGA HW
 ================================================
