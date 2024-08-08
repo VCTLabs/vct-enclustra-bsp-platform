@@ -12,7 +12,7 @@ Quick start steps:
 * cd somewhere
 * clone this repo
 * cd repo/
-* create venv with kas and activate
+* create venv with kas/enclustra and activate
 * edit the KAS configuration file ``build.yml``
 
 1. comment the machine key at the top (if not correrct)

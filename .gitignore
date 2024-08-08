@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # generated/user files and directories
+meta-*/
 ext/
 *.pdf
 
