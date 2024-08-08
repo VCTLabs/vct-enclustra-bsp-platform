@@ -28,26 +28,28 @@ Quick start steps:
 Run KAS directly without Tox
 ============================
 
-1. create a Python virtual environment, activate it, install kas::
+1. create a Python virtual environment, activate it, install kas
 
-  $ python -m venv .venv
-  $ source .venv/bin/activate
-  (.venv) $ python -m pip install kas
+::
+
+   $ python -m venv .venv
+   $ source .venv/bin/activate
+   (.venv) $ python -m pip install kas
 
 2. clone the "meta-project" layer (where the kas build.yml lives) and cd
    into it::
 
-  (.venv) $ git clone https://github.com/enclustra/meta-enclustra-socfpga.git -b v2023.1 meta-project
-  (.venv) $ cd meta-project/
+   (.venv) $ git clone https://github.com/enclustra/meta-enclustra-socfpga.git -b v2023.1 meta-project
+   (.venv) $ cd meta-project/
 
 3. edit the kas file ``meta-project/build.yml`` and check/set the desired
    values for keys ``machine`` and ``UBOOT_CONFIG``
 4. fetch the required metadata layers and build default refdes image::
 
-  (.venv) $ kas checkout meta-project/build.yml
-  (.venv) $ kas build meta-project/build.yml
+   (.venv) $ kas checkout meta-project/build.yml
+   (.venv) $ kas build meta-project/build.yml
 
-The second copmmand above above will populate the ``meta-project``
+The second command above will populate the ``meta-project``
 directory with layers and a build folder creatively named ``build``.
 By default all of the downloaded sources and locally created sstate
 cache files are also in the ``build`` folder but can be relocated to a
@@ -91,16 +93,13 @@ based on meta-intel-fpga: https://git.yoctoproject.org/meta-intel-fpga
 Supported Devices
 -----------------
 
-.. table:: Enclustra Device Support
-   :widths: auto
-
-   ===============  =================  ===========
-   Family           Module , Revision  Base Boards
-   ===============  =================  ===========
-   Intel Cyclone V  Mercury  SA1 , R3  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
-   Intel Cyclone V  Mercury+ SA2 , R1  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
-   Intel Arria 10   Mercury+ AA1 , R2  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
-   ===============  =================  ===========
+  ===============  =================  ===========
+  Family           Module , Revision  Base Boards
+  ===============  =================  ===========
+  Intel Cyclone V  Mercury  SA1 , R3  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
+  Intel Cyclone V  Mercury+ SA2 , R1  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
+  Intel Arria 10   Mercury+ AA1 , R2  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
+  ===============  =================  ===========
 
 
 Reference Designs for Intel Quartus II
