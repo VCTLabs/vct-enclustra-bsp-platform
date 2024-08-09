@@ -75,6 +75,80 @@ The (yocto) build config files can be found in the usual place in the
               rather *do* remove ``build/tmp-glibc`` for that very purpose.
 
 
+The initial build must fetch and build a large number of components, including
+several *very* large git repositories so the first build can take several hours.
+
+When finished, check the results::
+
+    (.venv) $ ls -1 build/tmp-glibc/deploy/images/refdes-me-aa1-270-2i2-d11e-nfx3-st1/
+    bitstream.core.rbf
+    bitstream.itb
+    bitstream.periph.rbf
+    boot-emmc.scr
+    boot-qspi.scr
+    boot-sdmmc.scr
+    boot.scr
+    devicetree
+    devicetree.dtb
+    fit_spl_fpga.itb
+    handoff
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.cpio.gz.u-boot
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.manifest
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.tar.gz
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.wic
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.wic.bmap
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.testdata.json
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.cpio.gz.u-boot
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.manifest
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.tar.gz
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.testdata.json
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.wic
+    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.wic.bmap
+    image-minimal-refdes.env
+    modules--6.1.38-lts+git0+21b5300ed5-r0-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.tgz
+    modules-refdes-me-aa1-270-2i2-d11e-nfx3-st1.tgz
+    socfpga_enclustra_mercury_emmc_overlay.dtbo
+    socfpga_enclustra_mercury_qspi_overlay.dtbo
+    socfpga_enclustra_mercury_sdmmc_overlay.dtbo
+    u-boot-refdes-me-aa1-270-2i2-d11e-nfx3-st1.sfp
+    u-boot-refdes-me-aa1-270-2i2-d11e-nfx3-st1.sfp-sdmmc
+    u-boot-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0.sfp
+    u-boot-socfpga-initial-env-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc
+    u-boot-socfpga-initial-env-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0
+    u-boot-socfpga-initial-env-sdmmc
+    u-boot-splx4.sfp
+    u-boot-splx4.sfp-refdes-me-aa1-270-2i2-d11e-nfx3-st1
+    u-boot-splx4.sfp-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc
+    u-boot-splx4.sfp-sdmmc
+    u-boot-splx4.sfp-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0
+    u-boot.img
+    u-boot.img-sdmmc
+    uImage
+    uImage--6.1.38-lts+git0+21b5300ed5-r0-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.bin
+    uImage-refdes-me-aa1-270-2i2-d11e-nfx3-st1.bin
+
+Since it already has all of the important bits, the main file(s) of interest
+in the listing above are the files ending in ``*.wic[.bmap]`` which are
+"raw" disk images used to flash MMC devices. Use these to create a bootable
+SDCard or USB stick.
+
+Many of the above are symlinks, but mainly there should be some obvious
+file types:
+
+* yocto build image files
+* FPGA bitstream files
+* kernel image, modules, and device tree files
+* u-boot image, boot script, and env files
+* the ``handoff`` directory
+
+The latter directory includes the Quartus project and u-boot/devicetree
+integration "glue" required to build the full sysem images. See the
+README.socfpga_ file in the U-boot source tree for the handoff "bridge"
+manual process description.
+
+.. _README.socfpga: https://github.com/u-boot/u-boot/blob/master/doc/README.socfpga
+
+
 Notes on Enclustra BSP for Cyclone/Arria FPGA HW
 ================================================
 
