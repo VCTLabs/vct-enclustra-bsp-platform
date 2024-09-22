@@ -9,6 +9,8 @@ bitbake/
 meta-*/
 ext/
 *.pdf
+*.wic.xz
+*.wic
 
 # C extensions
 *.so
