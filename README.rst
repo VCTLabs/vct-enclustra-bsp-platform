@@ -2,7 +2,7 @@ VCT enclustra BSP startup
 =========================
 
 The upstream Yocto build metadata mimics the (original) Altera/Intel
-``socfpg`` layers, but since it is a Brand New first release, it uses
+``socfpga`` layers, but since it is a Brand New first release, it uses
 the ``mickledore`` branches and a KAS_ build configuration.
 
 .. _KAS: https://kas.readthedocs.io/en/latest/command-line.html
