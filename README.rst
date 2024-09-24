@@ -16,7 +16,7 @@ Quick start steps:
 * edit the KAS configuration file ``meta-project/build.yml``
 
 1. comment the machine key at the top (if not correct)
-2. uncomment the desired machine key, eg: ``refdes-me-aa1-270-2i2-d11e-nfx3-st1``
+2. uncomment the desired machine key, eg: ``me-aa1-270-2i2-d11e-nfx3``
 3. do the same with the ``UBOOT_CONFIG`` env key, ie, choose the boot media
 4. save and exit
 
