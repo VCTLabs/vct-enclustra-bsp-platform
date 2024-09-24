@@ -28,7 +28,8 @@ Quick start steps:
 Run KAS directly without Tox
 ============================
 
-1. create a Python virtual environment, activate it, install kas
+1. create a Python virtual environment in this checkout, activate it, and
+   install kas:
 
 ::
 
@@ -36,22 +37,28 @@ Run KAS directly without Tox
    $ source .venv/bin/activate
    (.venv) $ python -m pip install kas
 
-2. clone the "meta-project" layer (where the kas build.yml lives) and cd
-   into it::
+2. clone the "user" layer (where the new kas build.yml lives):
 
-   (.venv) $ git clone https://github.com/enclustra/meta-enclustra-socfpga.git -b v2023.1 meta-project
-   (.venv) $ cd meta-project/
+::
 
-3. edit the kas file ``meta-project/build.yml`` and check/set the desired
-   values for keys ``machine`` and ``UBOOT_CONFIG``
-4. fetch the required metadata layers and build default refdes image::
+   (.venv) $ mkdir layers && cd layers/
+   (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore
+   (.venv) $ cd -
 
-   (.venv) $ kas checkout meta-project/build.yml
-   (.venv) $ kas build meta-project/build.yml
+3. edit the kas file ``layers/meta-user-aa1/build.yml`` and check/set the desired
+   value for the ``UBOOT_CONFIG`` key
 
-The second command above will populate the ``meta-project``
-directory with layers and a build folder creatively named ``build``.
-By default all of the downloaded sources and locally created sstate
+4. fetch the required metadata layers and build default refdes image:
+
+::
+
+   (.venv) $ kas checkout layers/meta-user-aa1/build.yml
+   (.venv) $ kas build layers/meta-user-aa1/build.yml
+
+
+The second command in step 4 above will populate the ``layers``
+directory with the cloned layers and create a build folder creatively named
+``build``. By default all of the downloaded sources and locally created sstate
 cache files are also in the ``build`` folder but can be relocated to a
 more convenient/shared location by using some `environment variables`_
 as shown below; set them before running the ``build`` command::
@@ -68,6 +75,9 @@ The (yocto) build config files can be found in the usual place in the
   (.venv) $ ls build/conf/
   bblayers.conf  local.conf  templateconf.cfg
 
+Note that changes made to the config files inside ``build/conf/`` are only
+temporary as Kas treats everything in the build folder as transitory. Any
+changes you wish to keep should be migrated to a Kas config file.
 
 .. _environment variables: https://kas.readthedocs.io/en/latest/command-line.html#variables-glossary
 
@@ -80,7 +90,7 @@ several *very* large git repositories so the first build can take several hours.
 
 When finished, check the results::
 
-    (.venv) $ ls -1 build/tmp-glibc/deploy/images/refdes-me-aa1-270-2i2-d11e-nfx3-st1/
+    (.venv) $ ls -1 build/tmp-glibc/deploy/images/<machine>/
     bitstream.core.rbf
     bitstream.itb
     bitstream.periph.rbf
@@ -141,10 +151,9 @@ file types:
 * u-boot image, boot script, and env files
 * the ``handoff`` directory
 
-The latter directory includes the Quartus project and u-boot/devicetree
-integration "glue" required to build the full sysem images. See the
-README.socfpga_ file in the U-boot source tree for the handoff "bridge"
-manual process description.
+The latter directory includes the Quartus project integration "glue" required\
+to build the full sysem images. See the README.socfpga_ file in the U-boot
+source tree for the handoff "bridge" manual process description.
 
 .. _README.socfpga: https://github.com/u-boot/u-boot/blob/master/doc/README.socfpga
 
