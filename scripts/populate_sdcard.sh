@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # populate sdcard partition with qspi build artifacts.
-# use predfined device name file list but allow ENV override
+# use predfined device name and file list but allow arg and ENV override.
 #
 
 set -euo pipefail
@@ -46,8 +46,30 @@ find_partitions_by_id()
     done
 }
 
-#echo "Mounting device: $DISK on /media"
-#sudo mount $DISK /media
+setup_rootfs()
+{
+    # Skip this command if is not a media device.
+    if ! $storage_is_media_device; then return 0; fi
+
+    find_partitions_by_id
+
+    echo "Mounting rootfs partition $DISK2..."
+
+    udisksctl mount -b "$DISK2"
+    ROOTFS_DIR=$(findmnt -n -o TARGET --source $DISK2)
+
+    # Verify that the disk is mounted, otherwise exit
+    if [ -z "$ROOTFS_DIR" ]; then exit 1; fi
+
+    [[ "${VERBOSE}" = "true" ]]  && echo "Copying qspi artifacts to $ROOTFS_DIR/home/root..."
+    sudo rm -rf $ROOTFS_DIR/home/root/qspi
+    sudo rsync -avh qspi $ROOTFS_DIR/home/root/
+    sync
+    udisksctl unmount -b "$DISK2"
+
+    echo "Done."
+}
+
 rm -rf qspi
 mkdir -p qspi
 
@@ -58,7 +80,7 @@ done
 cp -v $DEPLOY_DIR/$ROOTFS qspi/
 sync
 
-find_partitions_by_id
+setup_rootfs
 
 if ((failures != 0)); then
     echo "Something went wrong !!!"

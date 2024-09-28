@@ -13,17 +13,18 @@ Quick start steps:
 * clone this repo with -b <branch>
 * cd repo/
 * create .venv with ``tox -e dev``
-* edit the KAS configuration file ``meta-project/build.yml``
+* view/edit the KAS configuration file ``layers/meta-user-aa1/build.yml``
 
-1. comment the machine key at the top (if not correct)
-2. uncomment the desired machine key, eg: ``me-aa1-270-2i2-d11e-nfx3``
-3. do the same with the ``UBOOT_CONFIG`` env key, ie, choose the boot media
-4. save and exit
+Defaults are now the custom machine and user layer image, along with ``qspi``
+as default build config. User build knobs include:
+
+1. the desired machine key, eg: ``me-aa1-270-2i2-d11e-nfx3``
+2. the ``UBOOT_CONFIG`` env key setting for build cfg and boot media
 
 * check the contents of ``build/local.conf`` and ``build/bblayers.conf``
-  and adjust as needed.
+  and adjust as needed
 
-* run ``tox -e dev -- build`` to build refdes image for selected machine
+* run ``tox -e qspi`` to build the minimal devel image
 
 Run KAS directly without Tox
 ============================
@@ -45,10 +46,10 @@ Run KAS directly without Tox
    (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore
    (.venv) $ cd -
 
-3. edit the kas file ``layers/meta-user-aa1/build.yml`` and check/set the desired
-   value for the ``UBOOT_CONFIG`` key
+3. view/edit the kas file ``layers/meta-user-aa1/build.yml`` and check/set
+   the desired value for the ``UBOOT_CONFIG`` key
 
-4. fetch the required metadata layers and build default refdes image:
+4. fetch the required metadata layers and build default qspi devel image:
 
 ::
 
@@ -56,9 +57,10 @@ Run KAS directly without Tox
    (.venv) $ kas build layers/meta-user-aa1/build.yml
 
 
-The second command in step 4 above will populate the ``layers``
-directory with the cloned layers and create a build folder creatively named
-``build``. By default all of the downloaded sources and locally created sstate
+The first command in step 4 above will populate the ``layers`` directory
+with the cloned layers and create a build folder creatively named ``build``.
+
+By default all of the downloaded sources and locally created sstate
 cache files are also in the ``build`` folder but can be relocated to a
 more convenient/shared location by using some `environment variables`_
 as shown below; set them before running the ``build`` command::
@@ -84,9 +86,8 @@ changes you wish to keep should be migrated to a Kas config file.
 .. important:: *Do not* delete the build folder to start a fresh build,
               rather *do* remove ``build/tmp-glibc`` for that very purpose.
 
-
 The initial build must fetch and build a large number of components, including
-several *very* large git repositories so the first build can take several hours.
+several *very* large git repositories, so the first build can take several hours.
 
 When finished, check the results::
 
@@ -168,10 +169,10 @@ meta-enclustra-socfpga has one branch: v2023.1
 Contains two meta-layers:
 
 * meta-enclustra-module - BSP layer for enclustra
-* meta-enclustra-refdes - reference design using enclustra BSP
+* meta-enclustra-refdes - reference designs using enclustra BSP
 
 The top-level readme is not boiler-plate, but contains changelog and
-integration bits, some of which is shown below:
+integration bits, some of which are shown below:
 
 * Yocto branch: mickledore
 * U-Boot: 2023.01
