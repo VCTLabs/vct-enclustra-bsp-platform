@@ -1,0 +1,10 @@
+#/etc/udev/rules.d/60-bmaptool-optimizations.rules
+# vendor/product is white USB multireader
+SUBSYSTEM!="block", GOTO="bmaptool_optimizations_end"
+ACTION!="add|change", GOTO="bmaptool_optimizations_end"
+
+ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="058f", ATTRS{idProduct}=="6366", TAG+="uaccess"
+SUBSYSTEMS=="usb", ENV{DEVTYPE}!="partition", ATTRS{idVendor}=="058f", ATTRS{idProduct}=="6366", ATTR{bdi/min_ratio}="0", ATTR{bdi/max_ratio}="1", ATTR{queue/scheduler}="none"
+
+LABEL="bmaptool_optimizations_end"
+
