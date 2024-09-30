@@ -53,19 +53,19 @@ setup_rootfs()
 
     find_partitions_by_id
 
-    echo "Mounting rootfs partition $DISK2..."
+    echo "Mounting boot partition $DISK1..."
 
-    udisksctl mount -b "$DISK2"
-    ROOTFS_DIR=$(findmnt -n -o TARGET --source $DISK2)
+    udisksctl mount -b "$DISK1"
+    BOOT_DIR=$(findmnt -n -o TARGET --source $DISK1)
 
     # Verify that the disk is mounted, otherwise exit
-    if [ -z "$ROOTFS_DIR" ]; then exit 1; fi
+    if [ -z "$BOOT_DIR" ]; then exit 1; fi
 
-    [[ "${VERBOSE}" = "true" ]]  && echo "Copying qspi artifacts to $ROOTFS_DIR/home/root..."
-    sudo rm -rf $ROOTFS_DIR/home/root/qspi
-    sudo rsync -avh qspi $ROOTFS_DIR/home/root/
+    [[ "${VERBOSE}" = "true" ]]  && echo "Copying qspi artifacts to $BOOT_DIR/..."
+    rm -rf $BOOT_DIR/qspi
+    cp -rv qspi $BOOT_DIR/
     sync
-    udisksctl unmount -b "$DISK2"
+    udisksctl unmount -b "$DISK1"
 
     echo "Done."
 }
