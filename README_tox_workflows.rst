@@ -26,7 +26,7 @@ The workflow commands described here fall roughly into three categoroes:
 
 :dev: Sync and checkout build metadata, create virtual environment with
       build/deploy dependencies.
-:clean: Remove staged qspi artifacsts and Yocto ``build/tmp-*`` folder.
+:clean: Remove staged qspi artifacts and Yocto ``build/tmp-*`` folder.
 
 **Yocto build workflows**
 
@@ -42,30 +42,33 @@ The workflow commands described here fall roughly into three categoroes:
          to deployed sdcard artifact. Optionally apply polkit rule to
          provide equivalent console permissions.
 
-.. warning:: The above deployment workflows *directly touch* disk devices
-             and potentially *destroy any data* on the ``DISK`` target.
-             As the workflow user, *you* need to make sure the value
-             you provide is the correct ``DISK`` value for your sdcard
-             device, eg, ``/dev/mmcblk0`` or ``/dev/sdb``. See below for
-             an example.
+Big Fat Warning
+---------------
+
+.. important:: The above deployment workflows *directly touch* disk devices
+               and will *destroy any data* on the ``DISK`` target. Therefore,
+               as the workflow user, *you* need to make sure the value
+               you provide is the correct ``DISK`` value for your sdcard
+               device, eg, ``/dev/mmcblk0`` or ``/dev/sdb``. See below for
+               an example.
 
 Workflow permissions
 --------------------
 
 * general Linux development host permissions to install/update system packages
-* developement user added to removable media group, eg, ``disk``
-* developement user added to ``wheel`` group for polkit rule
+* development user added to removable media group, eg, ``disk``
+* development user added to ``wheel`` group for polkit rule
 
 
 General requirements
 ====================
 
 * supported Linux host with yocto build dependencies and tox package installed
-* development user with sudo priveleges to install OS packages
+* development user with sudo privileges to install OS packages
 
 With at least Python 3.8 and tox installed, clone this repository, then run
 the ``dev`` command to create the yocto build environment. From there, either
-use the virtual anvironment to run kas and/or bitbake commands *or* run one
+use the virtual environment to run kas and/or bitbake commands *or* run one
 or more ``tox`` commands to build/deploy specific yocto targets.
 
 Install dependencies on vendor-recommended Ubuntu build host::
@@ -130,7 +133,7 @@ tools, then build and install the python deps for running kas and bmaptool.
 The install results will end up in a tox virtual environment named ``.venv``
 which you can activate for manual use as needed.
 
-The tox/kas commands create to directories to contain the yocto metatdata
+The tox/kas commands create to directories to contain the yocto metadata
 and build outputs, ie, ``layers`` and ``build`` respectively. Note the Kas_
 tool treats both these directories as *transitory*, however, development
 workflows include testing yocto changes inside ``build/conf`` as well as
@@ -152,7 +155,14 @@ workflow environment descriptions::
   deploy  -> Deploy qspi build products to sdcard
 
 
-Note the primary tox commands given here are order-dependent, eg::
+.. note:: The default DISK value shown below is at least somewhat "safe"
+          as it is not likely to be critical on most development hardware.
+          If the value you provide, or the default device, does not exist,
+          then the deploy script will skip the sdcard deployment when
+          there is no device to mount.
+
+
+Also note the primary tox commands given here are order-dependent, eg::
 
   $ tox -e qspi                   # first build the qspi flash artifacts
   $ DISK=/dev/sda tox -e deploy   # then deploy the qspi artifacts to an existing sdcard
