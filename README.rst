@@ -20,7 +20,7 @@ on Tox automation, see the following YouTube video
 
 For more info see the additional readme doc: `README_tox_workflows.rst`_
 
-.. _`README_tox_workflows.rst: https://github.com/VCTLabs/vct-enclustra-bsp-platform/blob/oe-mickledore/README_tox_workflows.rst
+.. _README_tox_workflows.rst: README_tox_workflows.rst
 
 Old quick start steps:
 
