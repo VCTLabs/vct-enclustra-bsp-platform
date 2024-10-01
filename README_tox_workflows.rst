@@ -208,3 +208,59 @@ the yocto build tree, machine, and image names::
     MACHINE = {env:MACHINE:me-aa1-270-2i2-d11e-nfx3}
     UBOOT_CONFIG = {env:UBOOT_CONFIG:{envname}}
 
+
+Full QSPI flash example
+-----------------------
+
+End-to-end ``qspi`` flash example assuming a clean parent repo checkout.
+The following example runs the build/deploy commands to the bootable sdcard
+for deploying and installing the qspi build artifacts. After installing
+the yocto build dependencies and Tox_, run the following commands from
+a terminal window; note the first-time build will dowload several large
+source artifacts and build several thousand packages.
+
+Step 1. Create the required artifacts.
+
+::
+
+  $ cd $HOME/src
+  $ git clone https://github.com/VCTLabs/vct-enclustra-bsp-platform.git
+  $ cd vct-enclustra-bsp-platform/
+  $ tox -e dev                   # fetch all yocto layers
+  $ tox -e sdmmc                 # build a bootable sdcard image
+  # <insert USB card reader or sdcard>
+  $ DISK=/dev/sda tox -e bmap    # USE YOUR SDCARD DEVICE
+  $ tox -e qspi                  # build qspi flash artifacts
+  $ DISK=/dev/sda tox -e deploy  # deploy qspi flash artifacts to sdcard
+
+The last few lines of console messages should look like this::
+
+  Unmounted /dev/sda1.
+  Done.
+    deploy: OK (5.84=setup[0.04]+cmd[0.00,5.79] seconds)
+    congratulations :) (5.91 seconds)
+
+Step 2. Insert the SD card you just created in the AA1 card slot.
+
+Step 3. Attach serial console, power up the board, and stop the boot at the u-boot prompt.
+
+Step 4. From the u-boot prompt, run the following two commands marked by comments:
+
+::
+
+  => load mmc 0:1 ${loadaddr} flash.scr  # load flash script
+  1079 bytes read in 6 ms (174.8 KiB/s)
+  => source ${loadaddr}                  # run flash script, then WAIT
+  ## Executing script at 01000000
+  switch to partitions #0, OK
+  ...  # output snipped
+  device 0 offset 0x1000000, size 0x1000000
+  6029312 bytes written, 10747904 bytes skipped in 22.35s, speed 798915 B/s
+  device 0 offset 0x2000000, size 0x2000000
+  23330816 bytes written, 10223616 bytes skipped in 74.150s, speed 466033 B/s
+  =>
+
+
+Step 5. Confirm success and power OFF the board.
+
+Step 6. Remove the SD card and configure the hardware for QSPI boot.
