@@ -7,10 +7,25 @@ the ``mickledore`` branches and a KAS_ build configuration.
 
 .. _KAS: https://kas.readthedocs.io/en/latest/command-line.html
 
-Quick start steps:
+Tox workflows
+-------------
+
+Tox_ automation and virtual environment management is the basis for dev
+workflow standardization and repeatability. For a more "general" tutorial
+on Tox automation, see the following YouTube video
+`Automating Build, Test and Release Workflows with tox`_.
+
+.. _Tox: https://tox.wiki/en/4.21.0/
+.. _Automating Build, Test and Release Workflows with tox: https://www.youtube.com/watch?v=PrAyvH-tm8E
+
+For more info see the additional readme doc: `README_tox_workflows.rst`_
+
+.. _`README_tox_workflows.rst: https://github.com/VCTLabs/vct-enclustra-bsp-platform/blob/oe-mickledore/README_tox_workflows.rst
+
+Old quick start steps:
 
 * cd somewhere
-* clone this repo with -b <branch>
+* clone this repo - default branch is now ``oe-mickledore``
 * cd repo/
 * create .venv with ``tox -e dev``
 * view/edit the KAS configuration file ``layers/meta-user-aa1/build.yml``
@@ -183,13 +198,13 @@ based on meta-intel-fpga: https://git.yoctoproject.org/meta-intel-fpga
 Supported Devices
 -----------------
 
-  ===============  =================  ===========
-  Family           Module , Revision  Base Boards
-  ===============  =================  ===========
-  Intel Cyclone V  Mercury  SA1 , R3  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
-  Intel Cyclone V  Mercury+ SA2 , R1  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
-  Intel Arria 10   Mercury+ AA1 , R2  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
-  ===============  =================  ===========
+===============  =================  ===========
+Family           Module , Revision  Base Boards
+===============  =================  ===========
+Intel Cyclone V  Mercury  SA1 , R3  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
+Intel Cyclone V  Mercury+ SA2 , R1  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
+Intel Arria 10   Mercury+ AA1 , R2  Mercury+ PE1 / Mercury+ PE3 / Mercury+ ST1
+===============  =================  ===========
 
 
 Reference Designs for Intel Quartus II

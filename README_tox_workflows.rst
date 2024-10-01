@@ -20,7 +20,7 @@ enclustra docs Yocto layers:
 Workflow descriptions
 ---------------------
 
-The workflow commands described here fall roughly into three categoroes:
+The workflow commands described here fall roughly into three categories:
 
 **Workspace workflows**
 
@@ -125,6 +125,14 @@ Example: for DISK=/dev/mmcblkX
 
 Thus your value is ``DISK=/dev/mmcblk0`` which is the default workflow value
 so may be omitted.
+
+.. note:: The qspi deployment workflow SDCard requirement is essentially
+          "the first partition must be ``VFAT``". This allows both the
+          enclustra bootable SDCard *or* an empty VFAT-formatted card
+          to be used as the deployment DISK target. If your board has
+          been set to boot from QSPI, then there is no need to change
+          the boot target. Just build the ``qspi`` artifacts and use a
+          blank VFAT-formatted sdcard for the deployment workflow.
 
 
 Usage
