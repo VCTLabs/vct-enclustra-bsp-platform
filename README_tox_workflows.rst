@@ -49,8 +49,9 @@ Big Fat Warning
                and will *destroy any data* on the ``DISK`` target. Therefore,
                as the workflow user, *you* need to make sure the value
                you provide is the correct ``DISK`` value for your sdcard
-               device, eg, ``/dev/mmcblk0`` or ``/dev/sdb``. See below for
-               an example.
+               device, eg, ``/dev/mmcblk0`` or ``/dev/sdb``. See below in
+               section `Setup micro-SDCard`_ for an example of how to find
+               your device name.
 
 Workflow permissions
 --------------------
@@ -78,7 +79,7 @@ Install dependencies on vendor-recommended Ubuntu build host::
   chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
   iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 \
   xterm python3-subunit mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
-  $ sudo apt-get install python3-venv tree
+  $ sudo apt-get install python3-venv tree libgpgme-dev
 
 On ubuntu 20 or 22, install a newer version of tox into user home::
 
@@ -93,7 +94,8 @@ Setup micro-SDCard
 
 We need to access the External Drive to be utilized by the target device.
 Run lsblk to help figure out what linux device has been reserved for your
-External Drive.
+External Drive. To compare state, run ``lsblk`` before inserting the USB
+card reader, then run the same command again with the USB device inserted.
 
 Example: for DISK=/dev/sdX
 
@@ -129,11 +131,11 @@ Usage
 =====
 
 The commands shown below will clone the required yocto layers along with some
-tools, then build and install the python deps for running kas and bmaptool.
-The install results will end up in a tox virtual environment named ``.venv``
-which you can activate for manual use as needed.
+tools, then build and install the python deps for running build and deploy
+commands. The install results will end up in a tox virtual environment
+named ``.venv`` which you can activate for manual use as needed.
 
-The tox/kas commands create to directories to contain the yocto metadata
+The tox/kas commands create two directories to contain the yocto metadata
 and build outputs, ie, ``layers`` and ``build`` respectively. Note the Kas_
 tool treats both these directories as *transitory*, however, development
 workflows include testing yocto changes inside ``build/conf`` as well as
@@ -167,6 +169,7 @@ Also note the primary tox commands given here are order-dependent, eg::
   $ tox -e qspi                   # first build the qspi flash artifacts
   $ DISK=/dev/sda tox -e deploy   # then deploy the qspi artifacts to an existing sdcard
 
+
 Same goes for sdcard creation::
 
   $ tox -e sdmmc                  # first build the bootable sdcard image
@@ -177,6 +180,7 @@ Additional Tox environment commands include::
 
   $ tox -e changes    # generate a changelog
   $ tox -e clean      # clean build artifacts/tmp dir
+
 
 .. important:: When running tox commands using an existing build tree, it is
                advisable to run ``tox -e clean`` before (re)building the qspi

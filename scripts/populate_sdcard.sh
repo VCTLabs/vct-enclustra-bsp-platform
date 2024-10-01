@@ -64,6 +64,7 @@ setup_rootfs()
     [[ "${VERBOSE}" = "true" ]]  && echo "Copying qspi artifacts to $BOOT_DIR/..."
     rm -rf $BOOT_DIR/qspi
     cp -rv qspi $BOOT_DIR/
+    cp -v $DEPLOY_DIR/flash.scr $BOOT_DIR/
     sync
     udisksctl unmount -b "$DISK1"
 
