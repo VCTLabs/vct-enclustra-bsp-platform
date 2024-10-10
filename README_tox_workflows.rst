@@ -38,7 +38,7 @@ The workflow commands described here fall roughly into three categories:
 
 :bmap: Use vendor-recommended ``bmaptool`` to burn raw disk image to
        an SDCard. Optionally apply udev rule to optimize I/O performance.
-:deploy: Use ``udiskctl`` to handle SDCard mounts and deploy qspi artifacts
+:deploy: Use ``udisksctl`` to handle SDCard mounts and deploy qspi artifacts
          to deployed sdcard artifact. Optionally apply polkit rule to
          provide equivalent console permissions.
 
@@ -120,8 +120,8 @@ Example: for DISK=/dev/mmcblkX
   sda         8:0      0 465.8G  0 disk
   ├─sda1      8:1      0   512M  0 part /boot/efi
   └─sda2      8:2      0 465.3G  0 part /                <- Development Machine Root Partition
-  mmcblk0     179:0    0   962M  0 disk                  <- microSD/USB Storage Device
-  └─mmcblk0p1 179:1    0   961M  0 part                  <- microSD/USB Storage Partition
+  mmcblk0     179:0    0   962M  0 disk                  <- microSD/MMC Storage Device
+  └─mmcblk0p1 179:1    0   961M  0 part                  <- microSD/MMC Storage Partition
 
 Thus your value is ``DISK=/dev/mmcblk0`` which is the default workflow value
 so may be omitted.
