@@ -1,5 +1,5 @@
-Development Workflows with Tox
-==============================
+Development Workflows with Tox and Kas
+======================================
 
 Local tox workflows and helper scripts to automate building and deploying
 Yocto build artifacts, which includes the following features based on the
@@ -10,7 +10,7 @@ enclustra docs Yocto layers:
   into a python virtual environment managed by Tox_
 * build yocto images using supported boot modes (qspi and sdmmc)
 * optionally create sdcard image from sdmmc build
-* deploy qspi build artifacts to bootable sdcard rootfs
+* deploy qspi build artifacts to sdcard (bootable or empty)
 
 
 .. _Tox: https://github.com/tox-dev/tox
@@ -92,7 +92,7 @@ On ubuntu 20 or 22, install a newer version of tox into user home::
 Setup micro-SDCard
 ------------------
 
-We need to access the External Drive to be utilized by the target device.
+We need access to the External Drive to be utilized by the target device.
 Run lsblk to help figure out what linux device has been reserved for your
 External Drive. To compare state, run ``lsblk`` before inserting the USB
 card reader, then run the same command again with the USB device inserted.
@@ -194,6 +194,74 @@ Additional Tox environment commands include::
                advisable to run ``tox -e clean`` before (re)building the qspi
                or sdmmc artifacts.
 
+Kas commands
+------------
+
+First create a (Python) virtual environment for Kas using one of the following
+methods; note the extra commands when creating it manually.
+
+Use the Tox ``dev`` command::
+
+  $ tox -e dev
+  $ source .venv/bin/activate
+
+Or create one manually::
+
+  $ python -m venv .venv
+  $ source .venv/bin/activate
+  (.venv) $ python -m pip install kas
+  (.venv) $ mkdir layers
+  (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore layers/meta-user-aa1
+
+
+.. note:: Several (Yocto) build variables are given default values in the
+          kas config files, mainly to provide a consistent baseline for
+          kas commands. Thus the default machine name and image target are
+          defined in ``base.yaml``.  These values can be overridden on the
+          command line as shown below.
+
+
+Run the kas ``checkout`` command to (re)init Yocto build environment::
+
+   (.venv) $ kas checkout layers/meta-user-aa1/kas/systemd.yaml
+
+Use the kas ``build`` command to build the default image target::
+
+  (.venv) $ kas build layers/meta-user-aa1/kas/systemd.yaml
+
+The above is essentially what the first two tox comands do, but how to use
+the `` bitbake`` commands?
+
+Use the kas ``shell`` command to run arbitrary commands within the Yocto
+environment managed by kas.
+
+Build a non-default image::
+
+  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake devel-image-data'
+
+Build a specific software recipe::
+
+  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake libuio-ng'
+
+Override kas defaults::
+
+  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'UBOOT_CONFIG=sdmmc bitbake devel-image-data'
+
+Adjust the default kernel config::
+
+  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c kernel_configme virtual/kernel'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c menuconfig virtual/kernel'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c diffconfig virtual/kernel'
+
+The third command above will generate a config fragment with your changes
+and display the path to the file with extension ``.cfg``, eg, something like
+``long/path/to/config/fragment.cfg`` (see the `example here`_). Also note
+the `Yocto dev-manual`_ has even more useful info.
+
+
+.. _example here: https://wiki.koansoftware.com/index.php/Modify_the_linux_kernel_with_configuration_fragments_in_Yocto
+.. _Yocto dev-manual: https://docs.yoctoproject.org/dev-manual/index.html
+
 
 Workflow support files
 ----------------------
@@ -217,8 +285,8 @@ the yocto build tree, machine, and image names::
     UBOOT_CONFIG = {env:UBOOT_CONFIG:{envname}}
 
 
-Full QSPI flash example
------------------------
+Full QSPI flash example using Tox
+---------------------------------
 
 End-to-end ``qspi`` flash example assuming a clean parent repo checkout.
 The following example runs the build/deploy commands to the bootable sdcard
@@ -239,7 +307,7 @@ Step 1. Create the required artifacts.
   # <insert USB card reader or sdcard>
   $ DISK=/dev/sda tox -e bmap    # USE YOUR SDCARD DEVICE
   $ tox -e qspi                  # build qspi flash artifacts
-  $ DISK=/dev/sda tox -e deploy  # deploy qspi flash artifacts to sdcard
+  $ DISK=/dev/sda tox -e deploy  # USE YOUR SDCARD DEVICE
 
 The last few lines of console messages should look like this::
 
