@@ -229,7 +229,7 @@ Use the kas ``build`` command to build the default image target::
 
   (.venv) $ kas build layers/meta-user-aa1/kas/systemd.yaml
 
-The above is essentially what the first two tox comands do, but how to use
+The above is essentially what the first two tox commands do, but how to use
 the `` bitbake`` commands?
 
 Use the kas ``shell`` command to run arbitrary commands within the Yocto
@@ -285,6 +285,23 @@ the yocto build tree, machine, and image names::
     UBOOT_CONFIG = {env:UBOOT_CONFIG:{envname}}
 
 
+Expected build warnings
+-----------------------
+
+Currently expected build warnings are listed below; any additional warnings
+are most likely specific to a given build environment.
+
+:too-new-gcc: WARNING: Your host glibc version (2.39) is newer than that
+              in uninative (2.37). Disabling uninative so that sstate is
+              not corrupted.
+:missing-checksum: WARNING: exported-binaries-1.0-r0 do_fetch: Missing
+                   checksum... occurs when recipe uses ``BB_STRICT_CHECKSUM = "0"``
+                   in exported-binaries and hellogitcmake.
+
+.. note:: When using cmake in a bitbake recipe, you must also inherit the
+          ``pkconfig`` bbclass when using (cmake's) PkgConfig module.
+
+
 Full QSPI flash example using Tox
 ---------------------------------
 
@@ -292,7 +309,7 @@ End-to-end ``qspi`` flash example assuming a clean parent repo checkout.
 The following example runs the build/deploy commands to the bootable sdcard
 for deploying and installing the qspi build artifacts. After installing
 the yocto build dependencies and Tox_, run the following commands from
-a terminal window; note the first-time build will dowload several large
+a terminal window; note the first-time build will download several large
 source artifacts and build several thousand packages.
 
 Step 1. Create the required artifacts.
