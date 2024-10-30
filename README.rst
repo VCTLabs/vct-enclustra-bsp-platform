@@ -18,9 +18,9 @@ on Tox automation, see the following YouTube video
 .. _Tox: https://tox.wiki/en/4.21.0/
 .. _Automating Build, Test and Release Workflows with tox: https://www.youtube.com/watch?v=PrAyvH-tm8E
 
-For more info see the additional readme doc: `README_tox_workflows.rst`_
+For more info see the additional readme doc: `README_workflows.rst`_
 
-.. _README_tox_workflows.rst: README_tox_workflows.rst
+.. _README_workflows.rst: README_workflows.rst
 
 Old quick start steps:
 

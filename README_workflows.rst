@@ -30,6 +30,7 @@ The workflow commands described here fall roughly into three categories:
 
 **Yocto build workflows**
 
+:emmc: Build bootable emmc target for transfering to emmc flash from u-boot.
 :sdmmc: Build bootable sdcard target (sets UBOOT boot mode variable).
 :qspi: Clean and build corresponding named build target (sets UBOOT boot
        mode variable).
