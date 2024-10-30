@@ -28,7 +28,7 @@ Old quick start steps:
 * clone this repo - default branch is now ``oe-mickledore``
 * cd repo/
 * create .venv with ``tox -e dev``
-* view/edit the KAS configuration file ``layers/meta-user-aa1/build.yml``
+* view/edit the KAS configuration file ``layers/meta-user-aa1/kas/*.yaml``
 
 Defaults are now the custom machine and user layer image, along with ``qspi``
 as default build config. User build knobs include:
@@ -53,7 +53,7 @@ Run KAS directly without Tox
    $ source .venv/bin/activate
    (.venv) $ python -m pip install kas
 
-2. clone the "user" layer (where the new kas build.yml lives):
+2. clone the "user" layer (where the new kas base.yaml lives):
 
 ::
 
@@ -61,19 +61,19 @@ Run KAS directly without Tox
    (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore
    (.venv) $ cd -
 
-3. view/edit the kas file ``layers/meta-user-aa1/build.yml`` and check/set
+3. view/edit the kas file ``layers/meta-user-aa1/kas/base.yaml`` and check/set
    the desired value for the ``UBOOT_CONFIG`` key
 
 4. fetch the required metadata layers and build default qspi devel image:
 
 ::
 
-   (.venv) $ kas checkout layers/meta-user-aa1/build.yml
-   (.venv) $ kas build layers/meta-user-aa1/build.yml
+   (.venv) $ kas checkout layers/meta-user-aa1/kas/systemd.yaml
+   (.venv) $ kas build layers/meta-user-aa1/kas/systemd.yaml
 
 
-The first command in step 4 above will populate the ``layers`` directory
-with the cloned layers and create a build folder creatively named ``build``.
+The first command in step 4 above will populate the ``layers`` folder with
+the cloned layers and create a build folder creatively named ``build``.
 
 By default all of the downloaded sources and locally created sstate
 cache files are also in the ``build`` folder but can be relocated to a
