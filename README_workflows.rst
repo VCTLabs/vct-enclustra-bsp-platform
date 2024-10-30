@@ -357,3 +357,77 @@ Step 4. From the u-boot prompt, run the following two commands marked by comment
 Step 5. Confirm success and power OFF the board.
 
 Step 6. Remove the SD card and configure the hardware for QSPI boot.
+
+
+Full EMMC flash example using Tox
+---------------------------------
+
+End-to-end ``emmc`` flash example assuming a clean parent repo checkout.
+The following example runs the build/deploy commands to make the bootable
+sdcard and (not)bootable emmc-on-sdcard for installing via u-boot commands.
+After installing the yocto build dependencies and Tox_, run the following
+commands from a terminal window.
+
+1. Create the required artifacts:
+
+::
+
+  $ cd $HOME/src
+  $ git clone https://github.com/VCTLabs/vct-enclustra-bsp-platform.git
+  $ cd vct-enclustra-bsp-platform/
+  $ tox -e dev                   # init env and/or fetch yocto layers
+  $ tox -e sdmmc                 # build a bootable sdcard image
+  # <insert USB card reader or sdcard>
+  $ DISK=/dev/sda tox -e bmap    # USE YOUR SDCARD DEVICE
+  $ tox -e clean                 # clean the build/tmp dir
+  $ tox -e emmc                  # build a bootable emmc image
+  # <insert USB card reader or sdcard *using a different sdcard*>
+  $ DISK=/dev/sda tox -e bmap    # USE YOUR SDCARD DEVICE
+
+
+2. Insert the first SD card you just created in the AA1 card slot
+
+3. Attach serial console, power up the board, and stop the boot at the u-boot prompt
+
+4. Replace the SD card with the *second* one containing the eMMC image
+
+5. Copy the SD card content into the DDR memory using the updated size::
+
+    => mmc rescan
+    => mmc dev 0
+    => mmc read 0 0 0x114800
+
+5. Switch to the eMMC memory::
+
+    => altera_set_storage EMMC
+
+6. Copy the data from the DDR memory to the eMMC flash::
+
+    => mmc rescan
+    => mmc write 0 0 0x114800
+
+7. When completed, power off the board, remove the SD card, and configure
+   the hardware for EMMC boot
+
+
+.. note:: The above size is fixed in the .wks files, and should work using
+          the size above even with new packages and sysvinit or systemd images.
+          The size  is calculated and converted to hex as in the following
+          python example.
+
+
+Get current wic image physical size::
+
+    $ $ ls -l devel-image-minimal-me-aa1-emmc.wic
+    -rw-r--r-- 1 user user 579862528 Oct 29 16:47 devel-image-minimal-me-aa1-emmc.wic
+
+Open a python propmt::
+
+    $ python
+    Python 3.12.7 (main, Oct 19 2024, 22:38:25) [GCC 14.2.1 20240921] on linux
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> hex(579862528 // 512)
+    '0x114800'
+    >>>
+
+The size to use in the above u-boot ``mmc`` commands is ``0x114800``
