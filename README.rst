@@ -167,7 +167,7 @@ file types:
 * u-boot image, boot script, and env files
 * the ``handoff`` directory
 
-The latter directory includes the Quartus project integration "glue" required\
+The latter directory includes the Quartus project integration "glue" required
 to build the full sysem images. See the README.socfpga_ file in the U-boot
 source tree for the handoff "bridge" manual process description.
 

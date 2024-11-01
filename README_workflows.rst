@@ -30,10 +30,10 @@ The workflow commands described here fall roughly into three categories:
 
 **Yocto build workflows**
 
-:emmc: Build bootable emmc target for transfering to emmc flash from u-boot.
 :sdmmc: Build bootable sdcard target (sets UBOOT boot mode variable).
 :qspi: Clean and build corresponding named build target (sets UBOOT boot
        mode variable).
+:emmc: Build bootable emmc target for transfering to emmc flash from u-boot.
 
 **Deployment workflows**
 
@@ -161,6 +161,7 @@ workflow environment descriptions::
   default environments:
   dev     -> Create a kas build virtual environment with managed deps
   bmap    -> Burn the wic image to sdcard device (default: /dev/mmcblk0)
+  emmc    -> Build the (wic) emmc boot target
   sdmmc   -> Build the default (wic) sdmmc boot target
   qspi    -> Clean and build the qspi boot target
   deploy  -> Deploy qspi build products to sdcard
@@ -181,9 +182,13 @@ Also note the primary tox commands given here are order-dependent, eg::
 
 Same goes for sdcard creation::
 
-  $ tox -e sdmmc                  # first build the bootable sdcard image
+  $ tox -e sdmmc|emmc             # first build the ``.wic`` image
   $ DISK=/dev/sda tox -e bmap     # then burn the image to an sdcard
 
+
+Remember, the ``emmc`` ``.wic`` image is *not* bootable using the sdcard,
+rather, this sdcard is used to transfer the rootfs to the emmc flash from
+u-boot.
 
 Additional Tox environment commands include::
 
@@ -398,7 +403,7 @@ commands from a terminal window.
     => mmc dev 0
     => mmc read 0 0 0x114800
 
-5. Switch to the eMMC memory::
+5. Switch to the eMMC device::
 
     => altera_set_storage EMMC
 
