@@ -57,7 +57,7 @@ Big Fat Warning
 Workflow permissions
 --------------------
 
-* general Linux development host permissions to install/update system packages
+* general Linux development host permissions to install/update host OS packages
 * development user added to removable media group, eg, ``disk``
 * development user added to ``wheel`` group for polkit rule
 
@@ -66,7 +66,6 @@ General requirements
 ====================
 
 * supported Linux host with yocto build dependencies and tox package installed
-* development user with sudo privileges to install OS packages
 
 With at least Python 3.8 and tox installed, clone this repository, then run
 the ``dev`` command to create the yocto build environment. From there, either
@@ -259,7 +258,7 @@ Adjust the default kernel config::
   (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c menuconfig virtual/kernel'
   (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c diffconfig virtual/kernel'
 
-The third command above will generate a config fragment with your changes
+The third command above will generate a config fragment with the changes
 and display the path to the file with extension ``.cfg``, eg, something like
 ``long/path/to/config/fragment.cfg`` (see the `example here`_). Also note
 the `Yocto dev-manual`_ has even more useful info.
@@ -427,7 +426,7 @@ Get current wic image physical size::
     $ $ ls -l devel-image-minimal-me-aa1-emmc.wic
     -rw-r--r-- 1 user user 579862528 Oct 29 16:47 devel-image-minimal-me-aa1-emmc.wic
 
-Open a python propmt::
+Open a python prompt::
 
     $ python
     Python 3.12.7 (main, Oct 19 2024, 22:38:25) [GCC 14.2.1 20240921] on linux
@@ -437,3 +436,32 @@ Open a python propmt::
     >>>
 
 The size to use in the above u-boot ``mmc`` commands is ``0x114800``
+
+MMC images and partitions
+=========================
+
+The ``wic`` directory in the ``meta-user-aa1`` layer contains two kickstart
+files that mirror the image recipe names. The minimal image has one (usable)
+partition for the root filesystem, while the data image also contains an
+empty data partition. The new ``resize-last-part`` and ``resize-rootfs``
+recipes currently support sysvinit *only*, but feel free to contribute a
+systemd unit.
+
+To automatically resize the rootfs/data partitions on MMC devices, include
+the following recipe in the ``sysvinit.yaml`` kas config:
+
+* devel-image-minimal - add ``resize-rootfs`` to exapnd the root partition
+* devel-image-data - add ``resize-last-part`` to exapnd the data partition
+
+Conversely, to leave the existing partitions alone, remove the above recipes
+from the kas configuration.
+
+To specify a minimum amount of free space, add the following option to the
+``local_conf_header`` section of the desired YAML config, eg:
+
+.. code-block:: yaml
+
+  local_conf_header:
+    sysvinit: |
+          IMAGE_ROOTFS_EXTRA_SPACE = "524288"
+          ...
