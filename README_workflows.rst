@@ -304,13 +304,13 @@ are most likely specific to a given build environment.
                    in exported-binaries and hellogitcmake.
 
 .. note:: When using cmake in a bitbake recipe, you must also inherit the
-          ``pkconfig`` bbclass when using (cmake's) PkgConfig module.
+          ``pkgconfig`` bbclass when using (cmake's) PkgConfig module.
 
 
 Full QSPI flash example using Tox
 ---------------------------------
 
-End-to-end ``qspi`` flash example assuming a clean parent repo checkout.
+End-to-end ``qspi`` flash example assuming a clean parent repository checkout.
 The following example runs the build/deploy commands to the bootable sdcard
 for deploying and installing the qspi build artifacts. After installing
 the yocto build dependencies and Tox_, run the following commands from
@@ -325,7 +325,8 @@ Step 1. Create the required artifacts.
   $ git clone https://github.com/VCTLabs/vct-enclustra-bsp-platform.git
   $ cd vct-enclustra-bsp-platform/
   $ tox -e dev                   # fetch all yocto layers
-  $ tox -e sdmmc                 # build a bootable sdcard image
+  $ tox -e sdmmc                 # build a bootable sdcard image --or--
+  $ IPP="192.168.7.122:8080" tox -e sdmmc  # to set the pkg feed IP and port
   # <insert USB card reader or sdcard>
   $ DISK=/dev/sda tox -e bmap    # USE YOUR SDCARD DEVICE
   $ tox -e qspi                  # build qspi flash artifacts
@@ -367,7 +368,7 @@ Step 6. Remove the SD card and configure the hardware for QSPI boot.
 Full EMMC flash example using Tox
 ---------------------------------
 
-End-to-end ``emmc`` flash example assuming a clean parent repo checkout.
+End-to-end ``emmc`` flash example assuming a clean parent repository checkout.
 The following example runs the build/deploy commands to make the bootable
 sdcard and (not)bootable emmc-on-sdcard for installing via u-boot commands.
 After installing the yocto build dependencies and Tox_, run the following
@@ -450,8 +451,8 @@ systemd unit.
 To automatically resize the rootfs/data partitions on MMC devices, include
 the following recipe in the ``sysvinit.yaml`` kas config:
 
-* devel-image-minimal - add ``resize-rootfs`` to exapnd the root partition
-* devel-image-data - add ``resize-last-part`` to exapnd the data partition
+* devel-image-minimal - add ``resize-rootfs`` to expand the root partition
+* devel-image-data - add ``resize-last-part`` to expand the data partition
 
 Conversely, to leave the existing partitions alone, remove the above recipes
 from the kas configuration.
@@ -465,3 +466,102 @@ To specify a minimum amount of free space, add the following option to the
     sysvinit: |
           IMAGE_ROOTFS_EXTRA_SPACE = "524288"
           ...
+
+Yocto dev package feeds
+=======================
+
+Yocto/OE supports several package formats in addition to rootfs/image formats,
+where the default package format depends on yocto release and/or distribution
+(ie, "distro").
+
+* Yocto package formats - ipk, deb, rpm, tar
+
+Potential constraints on choosing a package format include:
+
+* openembedded support in SCAP Security Guide requires ``rpm``
+
+Native package managers are used for each format, and the on-device workflow
+is more-or-less the same given the minor command differences between each one.
+
+For example, ``apt-get`` vs. ``dnf``::
+
+  Ubuntu command --- Fedora command
+  ---------------------------------
+  apt-get update --- dnf check-update  # Note dnf updates its cache automatically
+                                       # before performing transactions
+  apt-get upgrade --- dnf upgrade
+  apt-get install --- dnf install
+  apt-get remove --- dnf remove
+  apt-get purge --- N/A
+  apt-cache search --- dnf search
+
+Package feed development workflow
+---------------------------------
+
+There are both recipes and configuration directives to facilitate usage of
+package feeds. The simplest way uses the deploy directory of an existing
+build tree and a simple web server (eg, the Python ``http.server`` module).
+Howver, an existing build tree is not a "stable" source for production
+workflows so the Yocto manual recommends copying the package tree to a
+more stable location on a "production" web server.
+
+Package feed quick start
+------------------------
+
+* the PACKAGE_FEED_URIS_ parameter is
+
+  - for python web server, use the IP address of the build server and
+    a non-privileged port number, something like ``192.168.0.123:8000``
+
+
+
+Dev package feed setup
+----------------------
+
+The ``deploy`` directory in a Yocto/OE build tree typically contains both
+package feeds and the build images, and is found under the ``build/tmp*``
+directory. A typical kas-created layout looks something like this::
+
+  $ ls build/ layers/
+  build/:
+  bitbake-cookerdaemon.log  cache  conf  downloads  sstate-cache  tmp-glibc
+
+  layers/:
+  bitbake                 meta-intel-fpga    meta-user-aa1
+  meta-enclustra-socfpga  meta-openembedded  openembedded-core
+
+Where the ``tmp`` directory in a default OE build is named ``tmp-glibc``::
+
+  $ ls build/tmp-glibc/deploy
+  images  licenses  rpm
+
+The web server document root in this situation would be the ``rpm`` directory::
+
+  build/tmp-glibc/deploy/rpm
+
+when using a development workflow and is the working directory for the Python
+``http.server`` module.
+
+Starting a web server in the package directory without setting any extra
+build parameters requires the target device to generate its own package cache,
+however, this is handled automatically when using the following build setting,
+something like::
+
+  PACKAGE_FEED_URIS = "http://<build_server_IP>:8080"
+
+The above will setup each of the build architectures under the ``rpm`` directory
+as a package feed. For customizing a production setup, use the additional params
+as needed:
+
+* PACKAGE_FEED_ARCHS_
+* PACKAGE_FEED_BASE_PATHS_
+
+.. _PACKAGE_FEED_URIS: https://docs.yoctoproject.org/ref-manual/variables.html#term-PACKAGE_FEED_URIS
+.. _PACKAGE_FEED_ARCHS: https://docs.yoctoproject.org/ref-manual/variables.html#term-PACKAGE_FEED_ARCHS
+.. _PACKAGE_FEED_BASE_PATHS: https://docs.yoctoproject.org/ref-manual/variables.html#term-PACKAGE_FEED_BASE_PATHS
+
+For more details, see the Yocto dev-manual section on `Runtime Package Management`_
+and Digital Ocean's `package manager comparison`_.
+
+.. _Runtime Package Management: https://docs.yoctoproject.org/dev-manual/packages.html#using-runtime-package-management
+.. _package manager comparison: https://www.digitalocean.com/community/tutorials/package-management-basics-apt-yum-dnf-pkg
