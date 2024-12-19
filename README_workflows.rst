@@ -228,11 +228,11 @@ Or create one manually::
 
 Run the kas ``checkout`` command to (re)init Yocto build environment::
 
-   (.venv) $ kas checkout layers/meta-user-aa1/kas/systemd.yaml
+   (.venv) $ kas checkout layers/meta-user-aa1/kas/sysvinit.yaml
 
 Use the kas ``build`` command to build the default image target::
 
-  (.venv) $ kas build layers/meta-user-aa1/kas/systemd.yaml
+  (.venv) $ kas build layers/meta-user-aa1/kas/sysvinit.yaml
 
 The above is essentially what the first two tox commands do, but how to use
 the `` bitbake`` commands?
@@ -242,21 +242,21 @@ environment managed by kas.
 
 Build a non-default image::
 
-  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake devel-image-data'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake devel-image-data'
 
 Build a specific software recipe::
 
-  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake libuio-ng'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake libuio-ng'
 
 Override kas defaults::
 
-  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'UBOOT_CONFIG=sdmmc bitbake devel-image-data'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'UBOOT_CONFIG=sdmmc bitbake devel-image-data'
 
 Adjust the default kernel config::
 
-  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c kernel_configme virtual/kernel'
-  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c menuconfig virtual/kernel'
-  (.venv) $ kas shell layers/meta-user-aa1/kas/systemd.yaml -c 'bitbake -c diffconfig virtual/kernel'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake -c kernel_configme virtual/kernel'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake -c menuconfig virtual/kernel'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake -c diffconfig virtual/kernel'
 
 The third command above will generate a config fragment with the changes
 and display the path to the file with extension ``.cfg``, eg, something like
@@ -505,10 +505,23 @@ Howver, an existing build tree is not a "stable" source for production
 workflows so the Yocto manual recommends copying the package tree to a
 more stable location on a "production" web server.
 
+.. important:: *Do not* install the ``distro-feed-configs`` package when using
+   the development workflow, rather *do* use the PACKAGE_FEED_URIS_ config
+   shown below. For production feeds, review the recipe and make your own
+   ``distro-feed-configs.bbappend`` recipe with your chosen options.
+
+Whenever you perform any sort of build step that can potentially generate a
+package or modify existing packages, it is always a good idea to re-generate
+the package index *after* the build by using the following command::
+
+  $ bitbake package-index
+
+
 Package feed quick start
 ------------------------
 
-* the PACKAGE_FEED_URIS_ parameter is
+* the PACKAGE_FEED_URIS_ parameter is a list of one or more feed URIs
+  starting with ``http://``
 
   - for python web server, use the IP address of the build server and
     a non-privileged port number, something like ``192.168.0.123:8000``
@@ -539,18 +552,18 @@ The web server document root in this situation would be the ``rpm`` directory::
 
   build/tmp-glibc/deploy/rpm
 
-when using a development workflow and is the working directory for the Python
-``http.server`` module.
+when using a development workflow and is the working directory (and web root)
+for a web server running on the build host.
 
 Starting a web server in the package directory without setting any extra
 build parameters requires the target device to generate its own package cache,
 however, this is handled automatically when using the following build setting,
 something like::
 
-  PACKAGE_FEED_URIS = "http://<build_server_IP>:8080"
+  PACKAGE_FEED_URIS = "http://<build_server_IP>:8000"
 
 The above will setup each of the build architectures under the ``rpm`` directory
-as a package feed. For customizing a production setup, use the additional params
+as a package feed. For customizing a development setup, use the additional params
 as needed:
 
 * PACKAGE_FEED_ARCHS_

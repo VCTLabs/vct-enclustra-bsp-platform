@@ -68,8 +68,8 @@ Run KAS directly without Tox
 
 ::
 
-   (.venv) $ kas checkout layers/meta-user-aa1/kas/systemd.yaml
-   (.venv) $ kas build layers/meta-user-aa1/kas/systemd.yaml
+   (.venv) $ kas checkout layers/meta-user-aa1/kas/sysvinit.yaml
+   (.venv) $ kas build layers/meta-user-aa1/kas/sysvinit.yaml
 
 
 The first command in step 4 above will populate the ``layers`` folder with
