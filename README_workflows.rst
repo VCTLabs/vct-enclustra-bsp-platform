@@ -419,6 +419,98 @@ commands from a terminal window.
 7. When completed, power off the board, remove the SD card, and configure
    the hardware for EMMC boot
 
+Alternate flash example using wic image and tftp
+------------------------------------------------
+
+This method requires the following conditions:
+
+* board can boot to the u-boot prompt from any of the available media (sdmmc, emmc, qspi)
+* an available tftp server for the yocto build directory
+* successful enclustra build of emmc image
+* we also assume the build host and enclustra board are on the same LAN
+  segment with a free static IP address for the board
+
+1. From a fresh checkout, create the required artifacts:
+
+::
+
+    $ git clone https://github.com/VCTLabs/vct-enclustra-bsp-platform.git
+    $ cd vct-enclustra-bsp-platform/
+    $ tox -e dev                   # init env and/or fetch yocto layers
+    $ tox -e emmc                  # build a bootable emmc image
+
+
+2. Enter the virtual environment and start the provided tftp server;
+   alternately use your own:
+
+::
+
+    $ source .venv/bin/activate
+    (.venv) $ export DOCROOT=build/tmp-glibc/deploy/images/me-aa1-270-2i2-d11e-nfx3/
+    (.venv) $ export IFACE=0.0.0.0
+    (.venv) $ export PORT=69
+    (.venv) $ export DEBUG=1  # optional for additional logging
+    (.venv) $ tftpdaemon start
+
+If using the provided tftp server above, observe the log path printed on
+startup and use ``tail -f <filename>`` to observe log messages.
+
+Without the DEBUG export, the status command will display the PID file path::
+
+    (.venv) $ tftpdaemon status
+    pidfile /home/user/.cache/pyserv/tftpd.pid found, daemon PID is 19099
+
+3. Boot the enclustra board and stop it at the u-boot prompt:
+
+::
+
+    U-Boot 2023.01 (Jun 20 2023 - 00:59:09 +0000)socfpga_arria10
+
+    CPU:   Altera SoCFPGA Arria 10
+    BOOT:  SD/MMC External Transceiver (1.8V)
+    Model: Enclustra Mercury+ AA1
+    DRAM:  2 GiB
+    Core:  82 devices, 22 uclasses, devicetree: separate
+    MMC:   dwmmc0@ff808000: 0
+    Loading Environment from FAT... Unable to read "uboot.env" from mmc0:1...
+    In:    serial
+    Out:   serial
+    Err:   serial
+    Model: Enclustra Mercury+ AA1
+    Net:   eth0: ethernet@ff800000
+    Hit any key to stop autoboot:  0
+    =>
+
+4. Set the tftp server address and give the board a static IP address
+   (assumed to be on the same subnet)::
+
+    => setenv serverip 192.168.7.134  # yocto build host
+    => setenv ipaddr 192.168.7.99     # enclustra board
+    => saveenv                        # make the values persistent
+
+5. Load the emmc flash image into memory::
+
+    => tftp 0 devel-image-minimal-me-aa1-270-2i2-d11e-nfx3-20241219200909.rootfs.wic
+
+6. Wait for the image to load::
+
+    ...
+    #####################################################################
+    #####################################################################
+    #####################################################################
+    done
+    Bytes transferred = 579862528 (22900000 hex)
+
+7. Copy the data from the DDR memory to the eMMC flash::
+
+    => altera_set_storage EMMC  # make sure EMMC device is active
+    => mmc rescan
+    => mmc write 0 0 0x114800
+
+8. When completed, power off the board, remove the SD card, and configure
+   the hardware for EMMC boot (if needed)
+
+
 .. note:: The emmc flash size shown above is fixed in the .wks files, but
           should continue to work using the size above even with new packages
           and sysvinit or systemd images (up to a point). The size used above
