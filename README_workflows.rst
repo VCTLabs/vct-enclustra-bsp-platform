@@ -365,8 +365,8 @@ Step 5. Confirm success and power OFF the board.
 Step 6. Remove the SD card and configure the hardware for QSPI boot.
 
 
-Full EMMC flash example using Tox
----------------------------------
+Full EMMC flash example using Tox (vendor version)
+--------------------------------------------------
 
 End-to-end ``emmc`` flash example assuming a clean parent repository checkout.
 The following example runs the build/deploy commands to make the bootable
@@ -403,6 +403,8 @@ commands from a terminal window.
     => mmc dev 0
     => mmc read 0 0 0x114800
 
+    MMC read: dev # 0, block # 0, count 1132544 ... 1132544 blocks read: OK
+
 5. Switch to the eMMC device::
 
     => altera_set_storage EMMC
@@ -412,19 +414,20 @@ commands from a terminal window.
     => mmc rescan
     => mmc write 0 0 0x114800
 
+    MMC write: dev # 0, block # 0, count 1132544 ... 1132544 blocks written: OK
+
 7. When completed, power off the board, remove the SD card, and configure
    the hardware for EMMC boot
 
+.. note:: The emmc flash size shown above is fixed in the .wks files, but
+          should continue to work using the size above even with new packages
+          and sysvinit or systemd images (up to a point). The size used above
+          is calculated and converted to hex as in the following python example.
 
-.. note:: The above size is fixed in the .wks files, and should work using
-          the size above even with new packages and sysvinit or systemd images.
-          The size  is calculated and converted to hex as in the following
-          python example.
+Get current wic image physical size; the size shown is for the 400 MB
+fixed-size rootfs::
 
-
-Get current wic image physical size::
-
-    $ $ ls -l devel-image-minimal-me-aa1-emmc.wic
+    $ ls -l devel-image-minimal-me-aa1-emmc.wic
     -rw-r--r-- 1 user user 579862528 Oct 29 16:47 devel-image-minimal-me-aa1-emmc.wic
 
 Open a python prompt::
@@ -526,6 +529,37 @@ Package feed quick start
   - for python web server, use the IP address of the build server and
     a non-privileged port number, something like ``192.168.0.123:8000``
 
+The following is required for simple dev package feeds:
+
+* a local web server with document root set to the top-level package
+  directory in the build tree
+* dev package feed setup with the build host (domain) name *or* IP address
+  and port number (as in the above example)
+* a build image with package feed config and package management feature
+  enabled
+
+Given the current kas config, initialize one of the build options with
+the build host web server address, something like::
+
+   $ IPP="192.168.1.42:8080" tox -e emmc
+
+Start the provided web server in the top-level directory with corresponding
+options::
+
+    $ source .venv/bin/activate
+    (.venv) $ export DOCROOT=build/tmp-glibc/deploy/ipk
+    (.venv) $ export IFACE=0.0.0.0
+    (.venv) $ export PORT=8080
+    (.venv) $ export DEBUG=1  # optional for additional logging
+    (.venv) $ httpdaemon start
+
+If using the provided http server above, observe the log path printed on
+startup and use ``tail -f <filename>`` to observe log messages.
+
+Without the DEBUG export, the status command will display the PID file path::
+
+    $ httpdaemon status
+    pidfile /home/user/.cache/pyserv/httpd.pid found, daemon PID is 7461
 
 
 Dev package feed setup
