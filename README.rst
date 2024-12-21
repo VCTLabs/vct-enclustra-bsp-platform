@@ -239,7 +239,10 @@ This reference design build was tested on following operating systems:
 
 Required Packages:
 
-The following packages are required for building this reference design on Ubuntu:
+The following packages are required for building this reference design on Ubuntu::
 
-  gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
+  libcap2-bin gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio \
+  python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git \
+  python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit \
+  mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
 

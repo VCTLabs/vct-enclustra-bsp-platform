@@ -43,6 +43,17 @@ The workflow commands described here fall roughly into three categories:
          to deployed sdcard artifact. Optionally apply polkit rule to
          provide equivalent console permissions.
 
+**Devel (manual) workflows**
+
+Use the (shared) virtual environment created by the above Tox commands to
+run arbitrary Kas, Yocto, or support commands, eg, start a TFTP server::
+
+    $ source .venv/bin/activate
+    (.venv) $ PORT=69 IFACE=0.0.0.0 DOCROOT=path/to/build/artifacts tftpdaemon start
+    (.venv) $ PORT=69 IFACE=0.0.0.0 DOCROOT=path/to/build/artifacts tftpdaemon status
+    pidfile /home/user/.cache/pyserv/tftpd.pid found, daemon PID is 10312
+
+
 Big Fat Warning
 ---------------
 
@@ -60,6 +71,13 @@ Workflow permissions
 * general Linux development host permissions to install/update host OS packages
 * development user added to removable media group, eg, ``disk``
 * development user added to ``wheel`` group for polkit rule
+* development user has sudo privs (a config using NOPASSWD for setcap is most
+  convenient)
+
+.. note:: Running a server on low port numbers (eg, tftp for u-boot) requires elevated
+          privileges (the tox environment handles this using ``setcap`` on the
+          python binaries inside the virtual environment). The required package
+          on Ubuntu is ``libcap2-bin``.
 
 
 General requirements
@@ -446,11 +464,8 @@ This method requires the following conditions:
 ::
 
     $ source .venv/bin/activate
-    (.venv) $ export DOCROOT=build/tmp-glibc/deploy/images/me-aa1-270-2i2-d11e-nfx3/
-    (.venv) $ export IFACE=0.0.0.0
-    (.venv) $ export PORT=69
     (.venv) $ export DEBUG=1  # optional for additional logging
-    (.venv) $ tftpdaemon start
+    (.venv) $ PORT=69 IFACE=0.0.0.0 DOCROOT=build/tmp-glibc/deploy/images/me-aa1-270-2i2-d11e-nfx3 tftpdaemon start
 
 If using the provided tftp server above, observe the log path printed on
 startup and use ``tail -f <filename>`` to observe log messages.
@@ -490,7 +505,8 @@ Without the DEBUG export, the status command will display the PID file path::
 
 5. Load the emmc flash image into memory::
 
-    => tftp 0 devel-image-minimal-me-aa1-270-2i2-d11e-nfx3-20241219200909.rootfs.wic
+    => altera_set_storage EMMC  # make sure EMMC device is active
+    => tftp 0 devel-image-minimal-me-aa1-270-2i2-d11e-nfx3.wic
 
 6. Wait for the image to load::
 
@@ -503,12 +519,28 @@ Without the DEBUG export, the status command will display the PID file path::
 
 7. Copy the data from the DDR memory to the eMMC flash::
 
-    => altera_set_storage EMMC  # make sure EMMC device is active
     => mmc rescan
     => mmc write 0 0 0x114800
 
+    MMC write: dev # 0, block # 0, count 1132544 ... 1132544 blocks written: OK
+
+
 8. When completed, power off the board, remove the SD card, and configure
-   the hardware for EMMC boot (if needed)
+   the hardware for EMMC boot (if needed).
+
+9. Power up the board and check free space::
+
+    me-aa1-270-2i2-d11e-nfx3 login: root
+    root@me-aa1-270-2i2-d11e-nfx3:~# free
+                   total        used        free      shared  buff/cache   available
+    Mem:         2066460       79068     2021040         160       25832     1987392
+    Swap:              0           0           0
+    root@me-aa1-270-2i2-d11e-nfx3:~# df -h
+    Filesystem                Size      Used Available Use% Mounted on
+    /dev/root                14.0G     48.8M     13.4G   0% /
+    devtmpfs               1000.5M         0   1000.5M   0% /dev
+    tmpfs                  1009.0M    104.0K   1008.9M   0% /run
+    tmpfs                  1009.0M     56.0K   1009.0M   0% /var/volatile
 
 
 .. note:: The emmc flash size shown above is fixed in the .wks files, but
@@ -516,7 +548,7 @@ Without the DEBUG export, the status command will display the PID file path::
           and sysvinit or systemd images (up to a point). The size used above
           is calculated and converted to hex as in the following python example.
 
-Get current wic image physical size; the size shown is for the 400 MB
+Get the current wic image physical size; the size shown is for the 400 MB
 fixed-size rootfs::
 
     $ ls -l devel-image-minimal-me-aa1-emmc.wic
@@ -635,15 +667,22 @@ the build host web server address, something like::
 
    $ IPP="192.168.1.42:8080" tox -e emmc
 
+.. note:: The above ``IPP`` variable is intended as a short "convenience"
+          value for Tox only. When using ``kas`` commands directly the
+          full variable name should be used, eg::
+
+            (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c \
+              'PACKAGE_FEED_IP_PORT="192.168.7.150:8000" UBOOT_CONFIG=emmc devel-image-minimal'
+
+          Feel free to set preferred IP address and PORT values in your
+          local kas build configuration instead.
+
 Start the provided web server in the top-level directory with corresponding
 options::
 
     $ source .venv/bin/activate
-    (.venv) $ export DOCROOT=build/tmp-glibc/deploy/ipk
-    (.venv) $ export IFACE=0.0.0.0
-    (.venv) $ export PORT=8080
     (.venv) $ export DEBUG=1  # optional for additional logging
-    (.venv) $ httpdaemon start
+    (.venv) $ PORT=8080 IFACE=0.0.0.0 DOCROOT=build/tmp-glibc/deploy/ipk httpdaemon start
 
 If using the provided http server above, observe the log path printed on
 startup and use ``tail -f <filename>`` to observe log messages.
