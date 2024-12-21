@@ -11,10 +11,11 @@ enclustra docs Yocto layers:
 * build yocto images using supported boot modes (qspi and sdmmc)
 * optionally create sdcard image from sdmmc build
 * deploy qspi build artifacts to sdcard (bootable or empty)
+* setup tftp and package feed workflows using Pyserv_
 
-
-.. _Tox: https://github.com/tox-dev/tox
+.. _Tox: https://tox.wiki/en/4.23.2/
 .. _Kas: https://kas.readthedocs.io/en/latest/command-line.html
+.. _Pyserv: https://sarnold.github.io/pyserv/
 
 
 Workflow descriptions
