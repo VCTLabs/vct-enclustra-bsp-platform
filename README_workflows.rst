@@ -11,10 +11,11 @@ enclustra docs Yocto layers:
 * build yocto images using supported boot modes (qspi and sdmmc)
 * optionally create sdcard image from sdmmc build
 * deploy qspi build artifacts to sdcard (bootable or empty)
+* setup tftp and package feed workflows using Pyserv_
 
-
-.. _Tox: https://github.com/tox-dev/tox
+.. _Tox: https://tox.wiki/en/4.23.2/
 .. _Kas: https://kas.readthedocs.io/en/latest/command-line.html
+.. _Pyserv: https://sarnold.github.io/pyserv/
 
 
 Workflow descriptions
@@ -43,6 +44,17 @@ The workflow commands described here fall roughly into three categories:
          to deployed sdcard artifact. Optionally apply polkit rule to
          provide equivalent console permissions.
 
+**Devel (manual) workflows**
+
+Use the (shared) virtual environment created by the above Tox commands to
+run arbitrary Kas, Yocto, or support commands, eg, start a TFTP server::
+
+    $ source .venv/bin/activate
+    (.venv) $ PORT=69 IFACE=0.0.0.0 DOCROOT=path/to/build/artifacts tftpdaemon start
+    (.venv) $ PORT=69 IFACE=0.0.0.0 DOCROOT=path/to/build/artifacts tftpdaemon status
+    pidfile /home/user/.cache/pyserv/tftpd.pid found, daemon PID is 10312
+
+
 Big Fat Warning
 ---------------
 
@@ -60,6 +72,13 @@ Workflow permissions
 * general Linux development host permissions to install/update host OS packages
 * development user added to removable media group, eg, ``disk``
 * development user added to ``wheel`` group for polkit rule
+* development user has sudo privs (a config using NOPASSWD for setcap is most
+  convenient)
+
+.. note:: Running a server on low port numbers (eg, tftp for u-boot) requires elevated
+          privileges (the tox environment handles this using ``setcap`` on the
+          python binaries inside the virtual environment). The required package
+          on Ubuntu is ``libcap2-bin``.
 
 
 General requirements
@@ -419,12 +438,118 @@ commands from a terminal window.
 7. When completed, power off the board, remove the SD card, and configure
    the hardware for EMMC boot
 
+Alternate flash example using wic image and tftp
+------------------------------------------------
+
+This method requires the following conditions:
+
+* board can boot to the u-boot prompt from any of the available media (sdmmc, emmc, qspi)
+* an available tftp server for the yocto build directory
+* successful enclustra build of emmc image
+* we also assume the build host and enclustra board are on the same LAN
+  segment with a free static IP address for the board
+
+1. From a fresh checkout, create the required artifacts:
+
+::
+
+    $ git clone https://github.com/VCTLabs/vct-enclustra-bsp-platform.git
+    $ cd vct-enclustra-bsp-platform/
+    $ tox -e dev                   # init env and/or fetch yocto layers
+    $ tox -e emmc                  # build a bootable emmc image
+
+
+2. Enter the virtual environment and start the provided tftp server;
+   alternately use your own:
+
+::
+
+    $ source .venv/bin/activate
+    (.venv) $ export DEBUG=1  # optional for additional logging
+    (.venv) $ PORT=69 IFACE=0.0.0.0 DOCROOT=build/tmp-glibc/deploy/images/me-aa1-270-2i2-d11e-nfx3 tftpdaemon start
+
+If using the provided tftp server above, observe the log path printed on
+startup and use ``tail -f <filename>`` to observe log messages.
+
+Without the DEBUG export, the status command will display the PID file path::
+
+    (.venv) $ tftpdaemon status
+    pidfile /home/user/.cache/pyserv/tftpd.pid found, daemon PID is 19099
+
+3. Boot the enclustra board and stop it at the u-boot prompt:
+
+::
+
+    U-Boot 2023.01 (Jun 20 2023 - 00:59:09 +0000)socfpga_arria10
+
+    CPU:   Altera SoCFPGA Arria 10
+    BOOT:  SD/MMC External Transceiver (1.8V)
+    Model: Enclustra Mercury+ AA1
+    DRAM:  2 GiB
+    Core:  82 devices, 22 uclasses, devicetree: separate
+    MMC:   dwmmc0@ff808000: 0
+    Loading Environment from FAT... Unable to read "uboot.env" from mmc0:1...
+    In:    serial
+    Out:   serial
+    Err:   serial
+    Model: Enclustra Mercury+ AA1
+    Net:   eth0: ethernet@ff800000
+    Hit any key to stop autoboot:  0
+    =>
+
+4. Set the tftp server address and give the board a static IP address
+   (assumed to be on the same subnet)::
+
+    => setenv serverip 192.168.7.134  # yocto build host
+    => setenv ipaddr 192.168.7.99     # enclustra board
+    => saveenv                        # make the values persistent
+
+5. Load the emmc flash image into memory::
+
+    => altera_set_storage EMMC  # make sure EMMC device is active
+    => tftp 0 devel-image-minimal-me-aa1-270-2i2-d11e-nfx3.wic
+
+6. Wait for the image to load::
+
+    ...
+    #####################################################################
+    #####################################################################
+    #####################################################################
+    done
+    Bytes transferred = 579862528 (22900000 hex)
+
+7. Copy the data from the DDR memory to the eMMC flash::
+
+    => mmc rescan
+    => mmc write 0 0 0x114800
+
+    MMC write: dev # 0, block # 0, count 1132544 ... 1132544 blocks written: OK
+
+
+8. When completed, power off the board, remove the SD card, and configure
+   the hardware for EMMC boot (if needed).
+
+9. Power up the board and check free space::
+
+    me-aa1-270-2i2-d11e-nfx3 login: root
+    root@me-aa1-270-2i2-d11e-nfx3:~# free
+                   total        used        free      shared  buff/cache   available
+    Mem:         2066460       79068     2021040         160       25832     1987392
+    Swap:              0           0           0
+    root@me-aa1-270-2i2-d11e-nfx3:~# df -h
+    Filesystem                Size      Used Available Use% Mounted on
+    /dev/root                14.0G     48.8M     13.4G   0% /
+    devtmpfs               1000.5M         0   1000.5M   0% /dev
+    tmpfs                  1009.0M    104.0K   1008.9M   0% /run
+    tmpfs                  1009.0M     56.0K   1009.0M   0% /var/volatile
+
+
 .. note:: The emmc flash size shown above is fixed in the .wks files, but
           should continue to work using the size above even with new packages
           and sysvinit or systemd images (up to a point). The size used above
           is calculated and converted to hex as in the following python example.
 
-Get current wic image physical size; the size shown is for the 400 MB
+Get the current wic image physical size; the size shown is for the 400 MB
 fixed-size rootfs::
 
     $ ls -l devel-image-minimal-me-aa1-emmc.wic
@@ -543,15 +668,22 @@ the build host web server address, something like::
 
    $ IPP="192.168.1.42:8080" tox -e emmc
 
+.. note:: The above ``IPP`` variable is intended as a short "convenience"
+          value for Tox only. When using ``kas`` commands directly the
+          full variable name should be used, eg::
+
+            (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c \
+              'PACKAGE_FEED_IP_PORT="192.168.7.150:8000" UBOOT_CONFIG=emmc devel-image-minimal'
+
+          Feel free to set preferred IP address and PORT values in your
+          local kas build configuration instead.
+
 Start the provided web server in the top-level directory with corresponding
 options::
 
     $ source .venv/bin/activate
-    (.venv) $ export DOCROOT=build/tmp-glibc/deploy/ipk
-    (.venv) $ export IFACE=0.0.0.0
-    (.venv) $ export PORT=8080
     (.venv) $ export DEBUG=1  # optional for additional logging
-    (.venv) $ httpdaemon start
+    (.venv) $ PORT=8080 IFACE=0.0.0.0 DOCROOT=build/tmp-glibc/deploy/ipk httpdaemon start
 
 If using the provided http server above, observe the log path printed on
 startup and use ``tail -f <filename>`` to observe log messages.

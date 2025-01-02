@@ -7,6 +7,15 @@ the ``mickledore`` branches and a KAS_ build configuration.
 
 .. _KAS: https://kas.readthedocs.io/en/latest/command-line.html
 
+Socfpga references and examples
+-------------------------------
+
+* https://www.rocketboards.org/foswiki/Documentation/WebHome
+* https://forum.rocketboards.org/
+* https://github.com/zangman/de10-nano
+* https://github.com/VCTLabs/DE1_SOC_Linux_FB
+* https://github.com/VCTLabs/DE1-SoC-Sound
+
 Tox workflows
 -------------
 
@@ -36,10 +45,10 @@ as default build config. User build knobs include:
 1. the desired machine key, eg: ``me-aa1-270-2i2-d11e-nfx3``
 2. the ``UBOOT_CONFIG`` env key setting for build cfg and boot media
 
-* check the contents of ``build/local.conf`` and ``build/bblayers.conf``
+* check the contents of ``build/conf/local.conf`` and ``build/conf/bblayers.conf``
   and adjust as needed
 
-* run ``tox -e qspi`` to build the minimal devel image
+* run ``tox -e sdmmc`` to build the minimal devel image for SDCard
 
 Run KAS directly without Tox
 ============================
@@ -239,7 +248,10 @@ This reference design build was tested on following operating systems:
 
 Required Packages:
 
-The following packages are required for building this reference design on Ubuntu:
+The following packages are required for building this reference design on Ubuntu::
 
-  gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
+  libcap2-bin gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio \
+  python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git \
+  python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit \
+  mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
 
