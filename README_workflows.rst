@@ -302,10 +302,10 @@ the ``scripts`` directory).
 Default options are set as tox environment variables with defaults matching
 the yocto build tree, machine, and image names::
 
-    DEPLOY_DIR = {env:DEPLOY_DIR:build/tmp-glibc/deploy/images/{env:MACHINE}}
+    DEPLOY_DIR = {env:DEPLOY_DIR:build/tmp-glibc/deploy/images/{env:KAS_MACHINE}}
     DISK = {env:DISK:/dev/mmcblk0}
     IMAGE = {env:IMAGE:devel-image-minimal}
-    MACHINE = {env:MACHINE:me-aa1-270-2i2-d11e-nfx3}
+    KAS_MACHINE = {env:KAS_MACHINE:me-aa1-270-2i2-d11e-nfx3}
     UBOOT_CONFIG = {env:UBOOT_CONFIG:{envname}}
 
 
