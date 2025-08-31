@@ -98,7 +98,7 @@ Install dependencies on vendor-recommended Ubuntu build host::
   chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
   iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 \
   xterm python3-subunit mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
-  $ sudo apt-get install python3-venv tree libgpgme-dev
+  $ sudo apt-get install python3-venv tree python3-gpg
 
 On ubuntu 20 or 22, install a newer version of tox into user home::
 
@@ -107,6 +107,16 @@ On ubuntu 20 or 22, install a newer version of tox into user home::
   $ which pip3
   /home/user/.local/bin/pip3
   $ pip3 install tox
+
+Install dependencies on Debian bookworm::
+
+  $ sudo apt-get update
+  $ sudo apt-get install gawk wget git diffstat unzip texinfo gcc build-essential \
+  chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
+  iputils-ping python3-git python3-jinja2 libegl1-mesa-dev libsdl1.2-dev pylint \
+  xterm python3-subunit mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
+  $ sudo apt-get install python3-venv tree python3-gpg
+
 
 Setup micro-SDCard
 ------------------
@@ -258,6 +268,10 @@ the `` bitbake`` commands?
 
 Use the kas ``shell`` command to run arbitrary commands within the Yocto
 environment managed by kas.
+
+Build SDK after default image::
+
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake devel-image-minimal -c populate_sdk'
 
 Build a non-default image::
 
