@@ -296,9 +296,56 @@ and display the path to the file with extension ``.cfg``, eg, something like
 ``long/path/to/config/fragment.cfg`` (see the `example here`_). Also note
 the `Yocto dev-manual`_ has even more useful info.
 
-
 .. _example here: https://wiki.koansoftware.com/index.php/Modify_the_linux_kernel_with_configuration_fragments_in_Yocto
 .. _Yocto dev-manual: https://docs.yoctoproject.org/dev-manual/index.html
+
+Working with multiple machine defs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Given the following machine definitions, you *can* change to another (related)
+MACHINE with an existing build tree. However, the SDK may cause build errors
+when building the SDK for a second machine. The workaround is to remove the
+existing ``sdk`` path from the build tree, leaving the rest of the tree intact.
+
+* initial machine is vendor default: ``me-aa1-270-2i2-d11e-nfx3``
+* second machine is custom debug platform: ``debug-baseboard``
+
+Command sequence and related artifacts::
+
+  $ tox -e dev
+  $ tox -e sdmmc
+  $ ls build/tmp-glibc/deploy/images
+  me-aa1-270-2i2-d11e-nfx3
+  $ source .venv/bin/activate
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake devel-image-minimal -c populate_sdk'
+  $ ls build/tmp-glibc/deploy/sdk/
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.host.manifest
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.sh
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.target.manifest
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.testdata.json
+
+Add the environment var for the second machine for each command::
+
+  $ KAS_MACHINE=debug-baseboard tox -e dev
+  $ KAS_MACHINE=debug-baseboard tox -e sdmmc
+  $ ls build/tmp-glibc/deploy/images
+  debug-baseboard me-aa1-270-2i2-d11e-nfx3
+  $ rm -rf build/tmp-glibc/deploy/sdk/
+  $ source .venv/bin/activate
+  (.venv) $ KAS_MACHINE=debug-baseboard kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake devel-image-minimal -c populate_sdk'
+  $ ls build/tmp-glibc/deploy/sdk/
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.host.manifest
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.sh
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.target.manifest
+  oecore-x86_64-cortexa9t2hf-neon-toolchain-nodistro.0.testdata.json
+
+Look inside the target.manifest to check for the correct machine on the
+machine-specific packages, eg, ``base-files``::
+
+  $ grep base-files build/tmp-glibc/deploy/sdk/*.target.manifest
+  base-files debug_baseboard 3.0.14-r89
+  base-files-dbg debug_baseboard 3.0.14-r89
+  base-files-dev debug_baseboard 3.0.14-r89
 
 
 Workflow support files
