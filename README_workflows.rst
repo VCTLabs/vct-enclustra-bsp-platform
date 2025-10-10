@@ -296,6 +296,18 @@ and display the path to the file with extension ``.cfg``, eg, something like
 ``long/path/to/config/fragment.cfg`` (see the `example here`_). Also note
 the `Yocto dev-manual`_ has even more useful info.
 
+Fetch build sources not managed by kas:
+
+* use ``<target> -c fetch`` to fetch <target> source
+* use ``<target> --runall=fetch`` to fetch all sources related to <target>
+* note the old ``<target> -c fetchall`` cmd is no longer supported
+
+Use one of the forms below to suit your needs::
+
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake virtual/kernel -c fetch'
+  (.venv) $ kas shell layers/meta-user-aa1/kas/sysvinit.yaml -c 'bitbake devel-image-minimal --runall=fetch'
+
+
 .. _example here: https://wiki.koansoftware.com/index.php/Modify_the_linux_kernel_with_configuration_fragments_in_Yocto
 .. _Yocto dev-manual: https://docs.yoctoproject.org/dev-manual/index.html
 
