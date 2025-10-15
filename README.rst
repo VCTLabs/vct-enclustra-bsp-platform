@@ -58,17 +58,16 @@ Run KAS directly without Tox
 
 ::
 
-   $ python -m venv .venv
+   $ python3 -m venv .venv
    $ source .venv/bin/activate
-   (.venv) $ python -m pip install kas
+   (.venv) $ python3 -m pip install kas
 
 2. clone the "user" layer (where the new kas base.yaml lives):
 
 ::
 
-   (.venv) $ mkdir layers && cd layers/
-   (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore
-   (.venv) $ cd -
+   (.venv) $ mkdir layers
+   (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore layers/meta-user-aa1
 
 3. view/edit the kas file ``layers/meta-user-aa1/kas/base.yaml`` and check/set
    the desired value for the ``UBOOT_CONFIG`` key
