@@ -244,6 +244,8 @@ Host Operating System:
 This reference design build was tested on following operating systems:
 
 * Ubuntu 22.04
+* Ubuntu 24.04
+* Debian bookworm
 
 Required Packages:
 
