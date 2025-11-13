@@ -256,3 +256,18 @@ The following packages are required for building this reference design on Ubuntu
   python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit \
   mesa-common-dev zstd liblz4-tool libyaml-dev libelf-dev python3-distutils
 
+.. note:: On Ubuntu 24 there is a required workaround for Apparmor's somewhat
+          restrictive namespace permissions. You will need to create a custom
+          profile as shown below, ie, create the profile with the displayed
+          content.
+
+::
+
+    $ cat /etc/apparmor.d/bitbake
+    abi <abi/4.0>,
+    include <tunables/global>
+    profile bitbake /**/bitbake/bin/bitbake flags=(unconfined) {
+            userns,
+    }
+
+    $ sudo apparmor_parser -r /etc/apparmor.d/bitbake
