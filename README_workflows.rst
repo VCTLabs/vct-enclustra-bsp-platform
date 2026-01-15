@@ -58,13 +58,12 @@ run arbitrary Kas, Yocto, or support commands, eg, start a TFTP server::
 Big Fat Warning
 ---------------
 
-.. important:: The above deployment workflows *directly touch* disk devices
-               and will *destroy any data* on the ``DISK`` target. Therefore,
-               as the workflow user, *you* need to make sure the value
-               you provide is the correct ``DISK`` value for your sdcard
-               device, eg, ``/dev/mmcblk0`` or ``/dev/sdb``. See below in
-               section `Setup micro-SDCard`_ for an example of how to find
-               your device name.
+.. important:: Some of the above deployment workflows *directly touch*
+    disk devices and will *destroy any data* on the ``DISK`` target.
+    Therefore, as the workflow user, *you* need to make sure the value you
+    provide is the correct ``DISK`` value for your sdcard device, eg,
+    ``/dev/mmcblk0`` or ``/dev/sdb``. See below in section `Setup
+    micro-SDCard`_ for an example of how to find your device name.
 
 Workflow permissions
 --------------------
@@ -251,8 +250,8 @@ Or create one manually::
 .. note:: Several (Yocto) build variables are given default values in the
           kas config files, mainly to provide a consistent baseline for
           kas commands. Thus the default machine name and image target are
-          defined in ``base.yaml``.  These values can be overridden on the
-          command line as shown below.
+          defined in ``enclustra.yaml`` and ``base.yaml`` respectively.
+          These values can be overridden on the command line as shown below.
 
 
 Run the kas ``checkout`` command to (re)init Yocto build environment::
