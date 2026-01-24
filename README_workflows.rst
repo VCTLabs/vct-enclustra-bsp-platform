@@ -644,15 +644,11 @@ MMC images and partitions
 The ``wic`` directory in the ``meta-user-aa1`` layer contains two kickstart
 files that mirror the image recipe names. The minimal image has one (usable)
 partition for the root filesystem, while the data image also contains an
-empty data partition. The new ``resize-last-part`` and ``resize-rootfs``
-recipes currently support sysvinit *only*, but feel free to contribute a
-systemd unit.
+empty data partition. The new ``resize-helper`` recipe supports both sysvinit
+and systemd.
 
-To automatically resize the rootfs/data partitions on MMC devices, include
-the following recipe in the ``sysvinit.yaml`` kas config:
-
-* devel-image-minimal - add ``resize-rootfs`` to expand the root partition
-* devel-image-data - add ``resize-last-part`` to expand the data partition
+To automatically resize the last partition (either rootfs or data) on MMC
+devices, include the ``resize-helper`` recipe in the your image install.
 
 Conversely, to leave the existing partitions alone, remove the above recipes
 from the kas configuration.
