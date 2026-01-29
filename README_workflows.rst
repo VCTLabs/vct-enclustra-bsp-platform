@@ -58,13 +58,12 @@ run arbitrary Kas, Yocto, or support commands, eg, start a TFTP server::
 Big Fat Warning
 ---------------
 
-.. important:: The above deployment workflows *directly touch* disk devices
-               and will *destroy any data* on the ``DISK`` target. Therefore,
-               as the workflow user, *you* need to make sure the value
-               you provide is the correct ``DISK`` value for your sdcard
-               device, eg, ``/dev/mmcblk0`` or ``/dev/sdb``. See below in
-               section `Setup micro-SDCard`_ for an example of how to find
-               your device name.
+.. important:: Some of the above deployment workflows *directly touch*
+    disk devices and will *destroy any data* on the ``DISK`` target.
+    Therefore, as the workflow user, *you* need to make sure the value you
+    provide is the correct ``DISK`` value for your sdcard device, eg,
+    ``/dev/mmcblk0`` or ``/dev/sdb``. See below in section `Setup
+    micro-SDCard`_ for an example of how to find your device name.
 
 Workflow permissions
 --------------------
@@ -251,8 +250,8 @@ Or create one manually::
 .. note:: Several (Yocto) build variables are given default values in the
           kas config files, mainly to provide a consistent baseline for
           kas commands. Thus the default machine name and image target are
-          defined in ``base.yaml``.  These values can be overridden on the
-          command line as shown below.
+          defined in ``enclustra.yaml`` and ``base.yaml`` respectively.
+          These values can be overridden on the command line as shown below.
 
 
 Run the kas ``checkout`` command to (re)init Yocto build environment::
@@ -645,15 +644,11 @@ MMC images and partitions
 The ``wic`` directory in the ``meta-user-aa1`` layer contains two kickstart
 files that mirror the image recipe names. The minimal image has one (usable)
 partition for the root filesystem, while the data image also contains an
-empty data partition. The new ``resize-last-part`` and ``resize-rootfs``
-recipes currently support sysvinit *only*, but feel free to contribute a
-systemd unit.
+empty data partition. The new ``resize-helper`` recipe supports both sysvinit
+and systemd.
 
-To automatically resize the rootfs/data partitions on MMC devices, include
-the following recipe in the ``sysvinit.yaml`` kas config:
-
-* devel-image-minimal - add ``resize-rootfs`` to expand the root partition
-* devel-image-data - add ``resize-last-part`` to expand the data partition
+To automatically resize the last partition (either rootfs or data) on MMC
+devices, include the ``resize-helper`` recipe in the your image install.
 
 Conversely, to leave the existing partitions alone, remove the above recipes
 from the kas configuration.

@@ -58,16 +58,16 @@ Run KAS directly without Tox
 
 ::
 
-   $ python3 -m venv .venv
-   $ source .venv/bin/activate
-   (.venv) $ python3 -m pip install kas
+  $ python3 -m venv .venv
+  $ source .venv/bin/activate
+  (.venv) $ python3 -m pip install kas
 
 2. clone the "user" layer (where the new kas base.yaml lives):
 
 ::
 
-   (.venv) $ mkdir layers
-   (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore layers/meta-user-aa1
+  (.venv) $ mkdir layers
+  (.venv) $ git clone https://github.com/VCTLabs/meta-user-aa1.git -b oe-mickledore layers/meta-user-aa1
 
 3. view/edit the kas file ``layers/meta-user-aa1/kas/base.yaml`` and check/set
    the desired value for the ``UBOOT_CONFIG`` key
@@ -76,8 +76,8 @@ Run KAS directly without Tox
 
 ::
 
-   (.venv) $ kas checkout layers/meta-user-aa1/kas/sysvinit.yaml
-   (.venv) $ kas build layers/meta-user-aa1/kas/sysvinit.yaml
+  (.venv) $ kas checkout layers/meta-user-aa1/kas/sysvinit.yaml
+  (.venv) $ kas build layers/meta-user-aa1/kas/sysvinit.yaml
 
 
 The first command in step 4 above will populate the ``layers`` folder with
@@ -85,14 +85,14 @@ the cloned layers and create a build folder creatively named ``build``.
 
 By default all of the downloaded sources and locally created sstate
 cache files are also in the ``build`` folder but can be relocated to a
-more convenient/shared location by using some `environment variables`_
-as shown below; set them before running the ``build`` command::
+more convenient/shared location by using the kas ``site.yaml`` file.
+Instead of the previous 2 commands, run the following::
 
-  (.venv) $ export DL_DIR="${HOME}/shared/downloads"
-  (.venv) $ export SSTATE_DIR="${HOME}/shared/oe/sstate-cache"
+  (.venv) $ kas checkout layers/meta-user-aa1/kas/sysvinit.yaml:layers/meta-user-aa1/kas/site.yaml
+  (.venv) $ kas build layers/meta-user-aa1/kas/sysvinit.yaml:layers/meta-user-aa1/kas/site.yaml
 
-.. note:: You may need to create the above directories manually before
-          starting a new build.
+.. note:: Adjust the paths *in the site file* as needed, but you should
+          avoid using the $HOME variable inside a kas config.
 
 The (yocto) build config files can be found in the usual place in the
 ``build`` folder, ie::
@@ -114,52 +114,52 @@ several *very* large git repositories, so the first build can take several hours
 
 When finished, check the results::
 
-    (.venv) $ ls -1 build/tmp-glibc/deploy/images/<machine>/
-    bitstream.core.rbf
-    bitstream.itb
-    bitstream.periph.rbf
-    boot-emmc.scr
-    boot-qspi.scr
-    boot-sdmmc.scr
-    boot.scr
-    devicetree
-    devicetree.dtb
-    fit_spl_fpga.itb
-    handoff
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.cpio.gz.u-boot
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.manifest
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.tar.gz
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.wic
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.wic.bmap
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.testdata.json
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.cpio.gz.u-boot
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.manifest
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.tar.gz
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.testdata.json
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.wic
-    image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.wic.bmap
-    image-minimal-refdes.env
-    modules--6.1.38-lts+git0+21b5300ed5-r0-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.tgz
-    modules-refdes-me-aa1-270-2i2-d11e-nfx3-st1.tgz
-    socfpga_enclustra_mercury_emmc_overlay.dtbo
-    socfpga_enclustra_mercury_qspi_overlay.dtbo
-    socfpga_enclustra_mercury_sdmmc_overlay.dtbo
-    u-boot-refdes-me-aa1-270-2i2-d11e-nfx3-st1.sfp
-    u-boot-refdes-me-aa1-270-2i2-d11e-nfx3-st1.sfp-sdmmc
-    u-boot-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0.sfp
-    u-boot-socfpga-initial-env-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc
-    u-boot-socfpga-initial-env-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0
-    u-boot-socfpga-initial-env-sdmmc
-    u-boot-splx4.sfp
-    u-boot-splx4.sfp-refdes-me-aa1-270-2i2-d11e-nfx3-st1
-    u-boot-splx4.sfp-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc
-    u-boot-splx4.sfp-sdmmc
-    u-boot-splx4.sfp-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0
-    u-boot.img
-    u-boot.img-sdmmc
-    uImage
-    uImage--6.1.38-lts+git0+21b5300ed5-r0-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.bin
-    uImage-refdes-me-aa1-270-2i2-d11e-nfx3-st1.bin
+  (.venv) $ ls -1 build/tmp-glibc/deploy/images/<machine>/
+  bitstream.core.rbf
+  bitstream.itb
+  bitstream.periph.rbf
+  boot-emmc.scr
+  boot-qspi.scr
+  boot-sdmmc.scr
+  boot.scr
+  devicetree
+  devicetree.dtb
+  fit_spl_fpga.itb
+  handoff
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.cpio.gz.u-boot
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.manifest
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.tar.gz
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.wic
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.rootfs.wic.bmap
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.testdata.json
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.cpio.gz.u-boot
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.manifest
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.tar.gz
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.testdata.json
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.wic
+  image-minimal-refdes-refdes-me-aa1-270-2i2-d11e-nfx3-st1.wic.bmap
+  image-minimal-refdes.env
+  modules--6.1.38-lts+git0+21b5300ed5-r0-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.tgz
+  modules-refdes-me-aa1-270-2i2-d11e-nfx3-st1.tgz
+  socfpga_enclustra_mercury_emmc_overlay.dtbo
+  socfpga_enclustra_mercury_qspi_overlay.dtbo
+  socfpga_enclustra_mercury_sdmmc_overlay.dtbo
+  u-boot-refdes-me-aa1-270-2i2-d11e-nfx3-st1.sfp
+  u-boot-refdes-me-aa1-270-2i2-d11e-nfx3-st1.sfp-sdmmc
+  u-boot-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0.sfp
+  u-boot-socfpga-initial-env-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc
+  u-boot-socfpga-initial-env-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0
+  u-boot-socfpga-initial-env-sdmmc
+  u-boot-splx4.sfp
+  u-boot-splx4.sfp-refdes-me-aa1-270-2i2-d11e-nfx3-st1
+  u-boot-splx4.sfp-refdes-me-aa1-270-2i2-d11e-nfx3-st1-sdmmc
+  u-boot-splx4.sfp-sdmmc
+  u-boot-splx4.sfp-sdmmc-v2023.01+gitAUTOINC+0fa4e757b5-r0
+  u-boot.img
+  u-boot.img-sdmmc
+  uImage
+  uImage--6.1.38-lts+git0+21b5300ed5-r0-refdes-me-aa1-270-2i2-d11e-nfx3-st1-20240808203438.bin
+  uImage-refdes-me-aa1-270-2i2-d11e-nfx3-st1.bin
 
 Since it already has all of the important bits, the main file(s) of interest
 in the listing above are the files ending in ``*.wic[.bmap]`` which are
@@ -263,11 +263,11 @@ The following packages are required for building this reference design on Ubuntu
 
 ::
 
-    $ cat /etc/apparmor.d/bitbake
-    abi <abi/4.0>,
-    include <tunables/global>
-    profile bitbake /**/bitbake/bin/bitbake flags=(unconfined) {
-            userns,
-    }
+  $ cat /etc/apparmor.d/bitbake
+  abi <abi/4.0>,
+  include <tunables/global>
+  profile bitbake /**/bitbake/bin/bitbake flags=(unconfined) {
+          userns,
+  }
 
-    $ sudo apparmor_parser -r /etc/apparmor.d/bitbake
+  $ sudo apparmor_parser -r /etc/apparmor.d/bitbake
