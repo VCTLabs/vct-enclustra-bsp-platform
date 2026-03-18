@@ -12,8 +12,7 @@ trap 'failures=$((failures+1))' ERR
 DISK=${1:-/dev/mmcblk0}
 DEPLOY_DIR=${2:-build/tmp-glibc/deploy/images/me-aa1-270-2i2-d11e-nfx3}
 
-FILES=${FILES:-"u-boot-splx4.sfp u-boot.img boot.scr devicetree.dtb socfpga_enclustra_mercury_qspi_overlay.dtbo bitstream.itb uImage"}
-ROOTFS=${ROOTFS:-devel-image-minimal-me-aa1-270-2i2-d11e-nfx3.cpio.gz.u-boot}
+FILES=${FILES:-"u-boot-splx4.sfp u-boot.img boot.scr bitstream.itb fitImage-devel-initramfs"}
 VERBOSE="false"  # set to "true" for extra output
 
 if [ -b "$DISK" ]; then
@@ -78,7 +77,6 @@ for file in ${FILES}; do
     cp -v "$DEPLOY_DIR"/"$file" qspi/
 done
 
-cp -v $DEPLOY_DIR/$ROOTFS qspi/
 sync
 
 setup_rootfs
