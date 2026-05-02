@@ -35,6 +35,7 @@ The workflow commands described here fall roughly into three categories:
 :qspi: Clean and build corresponding named build target (sets UBOOT boot
        mode variable).
 :emmc: Build bootable emmc target for transfering to emmc flash from u-boot.
+:qemu: Populate a qemuarm machine build tree for (yocto) emulator workflow.
 
 **Deployment workflows**
 

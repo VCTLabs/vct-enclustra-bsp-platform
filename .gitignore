@@ -8,7 +8,7 @@ bitbake/
 sstate-cache/
 *openembedded*/
 meta-*/
-dev-keys/
+*dev-keys/
 ext/
 qspi/
 *.pdf

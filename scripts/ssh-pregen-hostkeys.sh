@@ -1,7 +1,8 @@
 #!/bin/bash
 #
-# generate SSH host keys for yocto image, uses custom recipe to install
-# run as needed for dev builds; should always run prior to prod builds
+# pre-generate SSH host keys for yocto image, uses custom recipe to install,
+# run as needed for dev builds only (this is a bad thing, you know that,
+# right?)
 
 TOP_DIR=${1:-""}
 DEF_PATH=./layers/meta-user-aa1
